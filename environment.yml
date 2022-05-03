@@ -4,15 +4,17 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.7.9
+  - python==3.7.9
   - pip
-  - numpy==1.22.0
+  - numpy==1.19.0
   - pandas
   - pip:
     - matplotlib
     - scikit-learn==0.24.1
     - scipy==1.6.1
     - qiskit==0.36.1
+    - qiskit-aer-gpu==0.8.2
     - tqdm==4.59.0
     - mpi4py==3.0.3
     - numexpr==2.7.1
+    - ipykernel
