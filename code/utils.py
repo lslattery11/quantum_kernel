@@ -123,7 +123,7 @@ def get_dataset(name, dataset_dim, n_train, n_test):
         raise ValueError(f"Unknown dataset: {name}")
 
 
-def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500):
+def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500,device='CPU',MPI=False):
     """Builds Qiskit QuantumKernel object 
     with parameters passed directly to HamiltonianEvolutionFeatureMap
     """
@@ -132,7 +132,10 @@ def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, bat
     from qiskit_machine_learning.kernels import QuantumKernel
     if simulation_method == 'statevector' and shots != 1:
         raise ValueError(f'With simulation method {simulation_method} no shots are allowed')
-    quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots))
+    if MPI==False:
+        quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device))
+    else:
+        quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=23))
     return QuantumKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size)
 
 

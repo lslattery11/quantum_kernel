@@ -1,10 +1,7 @@
 import numpy as np
 import itertools
 import random
-from typing import Union, Optional, List, Any, Tuple, Sequence, Set, Callable
-from qiskit import Aer, QuantumCircuit, QuantumRegister
-from qiskit.circuit import Parameter,ParameterVector
-from qiskit.circuit.library import RXGate, RYGate, RZGate
+from typing import Union, Optional, List, Callable
 from qiskit.circuit.library.data_preparation.zz_feature_map import ZZFeatureMap
 
 class Sparse_IQP(ZZFeatureMap):
@@ -14,7 +11,7 @@ class Sparse_IQP(ZZFeatureMap):
         reps: int = 2,
         connectivity: str = "full",
         density: Union[str,int] = 'max',
-
+        int_time_scale: float = 1.0,
         data_map_func: Optional[Callable[[np.ndarray], float]] = None,
         parameter_prefix: str = "x",
         insert_barriers: bool = False,
@@ -44,7 +41,7 @@ class Sparse_IQP(ZZFeatureMap):
             insert_barriers=insert_barriers,
             name=name,
         )
-
+        self.int_time_scale=int_time_scale
 
     def get_entangler_map(self, rep_num: int, block_num: int, num_block_qubits: int
     ):
@@ -60,7 +57,11 @@ class Sparse_IQP(ZZFeatureMap):
         else:
             return super().get_entangler_map(rep_num,block_num,num_block_qubits)
 
-
+    def pauli_evolution(self,pauli_string,time):
+        if len(pauli_string) == 2:
+            time=self.int_time_scale*time
+        return super().pauli_evolution(pauli_string,time)
+    
 def get_entanglement(connectivity,density,num_qubits):
     """ 
     Create get_entanglement for the Sparse_IQP class's modified NLocal class method get_entangler_map.

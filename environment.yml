@@ -4,17 +4,19 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python==3.7.9
+  - python==3.9
   - pip
-  - numpy==1.19.0
+  - numpy
   - pandas
+  - seaborn
   - pip:
     - matplotlib
     - scikit-learn==0.24.1
     - scipy==1.6.1
     - qiskit==0.36.1
+    - qiskit-machine-learning==0.4.0
     - qiskit-aer-gpu==0.8.2
-    - tqdm==4.59.0
-    - mpi4py==3.0.3
+    - tqdm==4.61.2
     - numexpr==2.7.1
     - ipykernel
+    - mpi4py==3.1.3
