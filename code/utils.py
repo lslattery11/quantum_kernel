@@ -212,7 +212,6 @@ def get_additional_fields(row, datasets, dumb_CV):
     """
     x_train, x_test, y_train, y_test = datasets[row['dataset_dim']]
     assert(row['qkern_matrix_train'].shape == (len(x_train),len(x_train)))
-
     C_range = [0.006, 0.015, 0.03, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256, 512, 1024]
     if dumb_CV:
         C_opt = precomputed_kernel_GridSearchCV_dumb(row['qkern_matrix_train'], y_train, C_range)
@@ -231,9 +230,10 @@ def get_additional_fields(row, datasets, dumb_CV):
     n_support_ave = np.mean(n_support)
     norm_K_id = np.linalg.norm(row['qkern_matrix_train'] - np.eye(row['qkern_matrix_train'].shape[0]))
 
+
     return test_score, train_score, n_support, n_support_ave, C_opt, norm_K_id
 
-def compute_additional_fields(df, dataset_name, dumb_CV=False):
+def compute_additional_fields(df, dataset_name, dumb_CV=False,kernel_name=None):
     datasets = {}
     for dataset_dim in set(df['dataset_dim']):
         datasets[dataset_dim] = get_dataset(dataset_name, dataset_dim, 800, 200)
@@ -250,6 +250,8 @@ def compute_additional_fields(df, dataset_name, dumb_CV=False):
         axis=1,
         result_type="expand",
     )
+
+    df['kernel_name']=kernel_name
     return df
 
 def self_product(x: np.ndarray) -> float:
