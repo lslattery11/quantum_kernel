@@ -10,6 +10,8 @@ from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 from functools import reduce
 
+from quantum_kernel.code.quantum_kernels.projected_kernels import RDM1ProjectedKernel
+
 utils_folder = Path(__file__).parent
 
 def load_mnist(path, kind='train'):
@@ -137,6 +139,21 @@ def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, bat
     else:
         quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=23))
     return QuantumKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size)
+
+def get_projected_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500,device='CPU',MPI=False):
+    """Builds my Qiskit projected QuantumKernel object
+    with parameters passed directly to HamiltonianEvolutionFeatureMap
+    """
+    from qiskit.providers.aer import AerSimulator
+    from qiskit.utils import QuantumInstance
+    from qiskit_machine_learning.kernels import QuantumKernel
+    if simulation_method == 'statevector' and shots != 1:
+        raise ValueError(f'With simulation method {simulation_method} no shots are allowed')
+    if MPI==False:
+        quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device))
+    else:
+        quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=23))
+    return RDM1ProjectedKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size)
 
 
 def precomputed_kernel_GridSearchCV(K, y, Cs, n_splits=5, test_size=0.2, random_state=42):

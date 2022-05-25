@@ -29,7 +29,7 @@ class RDM1ProjectedKernel(QuantumKernel):
         self.gamma=gamma
         self._measured_qubits=measured_qubits
 
-    def _construct_circuit(self,
+    def construct_circuit(self,
         x: ParameterVector,
         y: ParameterVector = None,
         measurement: bool = True,
@@ -62,8 +62,11 @@ class RDM1ProjectedKernel(QuantumKernel):
         cx = ClassicalRegister(self._feature_map.num_qubits, "c")
         qcx = QuantumCircuit(qx, cx,name='qcx')
         x_dict = dict(zip(self._feature_map.parameters, x))
+        print(self.feature_map.parameters)
         psi_x = self._feature_map.assign_parameters(x_dict)
         qcx.append(psi_x.to_instruction(), qcx.qubits)
+        print(psi_x.parameters)
+        print(qcx.parameters)
         #create circuit for data y
         qy = QuantumRegister(self._feature_map.num_qubits, "q")
         cy = ClassicalRegister(self._feature_map.num_qubits, "c")
@@ -73,6 +76,7 @@ class RDM1ProjectedKernel(QuantumKernel):
         y_dict = dict(zip(self._feature_map.parameters, y))
         psi_y = self._feature_map.assign_parameters(y_dict)
         qcy.append(psi_y.to_instruction(), qcy.qubits)
+        print(qcy.parameters)
         #add measurements to the appropriate qubits.
         qcxs=[]
         qcys=[]
@@ -89,7 +93,7 @@ class RDM1ProjectedKernel(QuantumKernel):
                 qcys.append(new_qcy)
         else:
             raise ValueError(
-                "Still need to implement statevector_sim support for _construct_circuit"
+                "Still need to implement statevector_sim support for construct_circuit"
             )
         return qcxs,qcys
 
@@ -236,13 +240,15 @@ class RDM1ProjectedKernel(QuantumKernel):
                 measurement=measurement,
                 is_statevector_sim=is_statevector_sim,
             )
+            print(len(parameterized_circuits_y))
+            print(type(parameterized_circuits_y[0]))
             parameterized_circuits_x = self._quantum_instance.transpile(
                 parameterized_circuits_x, pass_manager=self._quantum_instance.unbound_pass_manager
             )
             parameterized_circuits_y = self._quantum_instance.transpile(
                 parameterized_circuits_y, pass_manager=self._quantum_instance.unbound_pass_manager
             )
-            
+            print(type(parameterized_circuits_y[0]))
             for idx in range(0, len(mus), self._batch_size):
                 to_be_computed_data_pair = []
                 to_be_computed_index = []
@@ -255,6 +261,7 @@ class RDM1ProjectedKernel(QuantumKernel):
                         to_be_computed_data_pair.append((x_i, y_j))
                         to_be_computed_index.append((i, j))
                 #need to change here.
+                print('here')
                 circuits_x = [[
                     parameterized_circuits_x[idx].assign_parameters(
                         {feature_map_params_x: x}
@@ -263,15 +270,17 @@ class RDM1ProjectedKernel(QuantumKernel):
                 ]
                     for x, y in to_be_computed_data_pair
                 ]
+                print('here2')
                 circuits_y = [[
                     parameterized_circuits_y[idx].assign_parameters(
                         {feature_map_params_y: y}
                     )
-                    for idx in range(len(parameterized_circuits_x))
+                    for idx in range(len(parameterized_circuits_y))
                 ]
                     for x, y in to_be_computed_data_pair
                 ]
-
+                print('here3')
+                print(circuits_y[0])
 
                 if self._quantum_instance.bound_pass_manager is not None:
                     circuits_x = self._quantum_instance.transpile(
@@ -280,15 +289,19 @@ class RDM1ProjectedKernel(QuantumKernel):
                     circuits_y = self._quantum_instance.transpile(
                         circuits_y, pass_manager=self._quantum_instance.bound_pass_manager
                     )
-
+                print(circuits_y[0])
                 results_x = self._quantum_instance.execute(circuits_x, had_transpiled=True)
                 results_y = self._quantum_instance.execute(circuits_y, had_transpiled=True)
                 #setting to None, can change if I it turns out I want to use a specific basis and deviate
                 #from the paper.
                 measurement_basis = None
+                return results_x,results_y
+            """                
                 matrix_elements = [
+
                     self._compute_overlap(idx, results_x,results_y, is_statevector_sim, measurement_basis)
                     for idx in range(len(circuits_x))
+
                 ]
 
                 for (i, j), value in zip(to_be_computed_index, matrix_elements):
@@ -303,5 +316,6 @@ class RDM1ProjectedKernel(QuantumKernel):
                 # adjustment is only done if NOT using the statevector simulation.
                 D, U = np.linalg.eig(kernel)  # pylint: disable=invalid-name
                 kernel = U @ np.diag(np.maximum(0, D)) @ U.transpose()
-
+ 
         return kernel
+            """
