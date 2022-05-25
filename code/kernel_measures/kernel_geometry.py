@@ -40,9 +40,28 @@ def training_geometric_difference(K1,K2,lam=0,tol=1e-3):
     gd=lam*np.linalg.norm(multiplied,ord=np.inf)**(1/2)
     return gd
 
-#takes as input two pd.Dataframes of kernels and 1 of their hyperparameters
-# and compute the matrix of their geometric difference Mij=gd(k1[i]||k2[j])
-def test(kseries1: pd.Series,kseries2: pd.Series,lam=0):
-    Mij=np.zeros((len(kseries1),len(kseries2)))
-    
-    return
+#takes as input two pd.Dataframes of kernels and one of their hyperparameters
+# and compute the matrix of the relevant metric i.e. Mij=gd(k1[i]||k2[j]) for geometric difference
+def compute_metric_matrix(df1: pd.DataFrame,df2: pd.DataFrame,metric):
+    metric_dict={'geometric_difference':geometric_difference}
+    M=np.zeros((len(df1),len(df2)))
+    assert(len(df1.columns)==2),'number of keys must be 2'
+    assert(len(df2.columns)==2),'number of keys must be 2'
+    #get hyperparameter names
+    h1=np.setdiff1d(df1.columns.values,np.array(['qkern_matrix_train']))[0]
+    h2=np.setdiff1d(df2.columns.values,np.array(['qkern_matrix_train']))[0]
+    #sort DataFrame by hyper parameter
+    sorted_df1=df1.sort_values(h1)
+    sorted_df2=df2.sort_values(h2)
+    x=sorted_df1[h1]
+    y=sorted_df2[h2]
+    #get relevant function for metric
+    f=metric_dict[metric]
+    #compute geometric difference matrix
+    for i,a in enumerate(x):
+        for j,b in enumerate(y):
+            K1=sorted_df1[sorted_df1[h1] == a]['qkern_matrix_train'].values[0]
+            K2=sorted_df2[sorted_df2[h2] == b]['qkern_matrix_train'].values[0]
+            M[i][j]=f(K1,K2)
+    #return sorted hyper parameters and metric matrix.
+    return x, y, M
