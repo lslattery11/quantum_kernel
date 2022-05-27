@@ -45,7 +45,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     kernel_dict={'rbf':rbf_kernel,'laplacian':laplacian_kernel}
-
+    
     outpath = Path(args.outpath, f"dim_{args.dataset_dim}_kernel_{args.kernel}_gamma_{args.gamma}_dec_{args.decimals}_{args.dataset}.p")
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")

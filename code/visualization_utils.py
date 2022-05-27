@@ -32,6 +32,7 @@ def aggregate_pickles(all_pickles_paths, dataset_name,kernel_name):
     ##df_all.drop(columns=['qkern_matrix_train', 'qkern_matrix_test'], inplace=True)
     return df_all   
 
+#ugly should rewrite eventually
 def aggregate_folder(folder,dataset_name,kernel_name):
     dfs={}
     label = Path(folder).stem
