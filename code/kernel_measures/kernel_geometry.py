@@ -132,3 +132,16 @@ def compute_metric_matrix(df1: pd.DataFrame,df2: pd.DataFrame,metric,k=10):
             M[j][i]=f(K1,K2,k=k)
     #return sorted hyper parameters and metric matrix.
     return x, y, M
+
+def compute_kernel_target_alignment(K):
+    raise NotImplementedError('have not finished function')
+    return
+
+#Eq. 6 in https://arxiv.org/pdf/2006.13198.pdf
+def compute_task_model_alignment(K,target):
+    raise NotImplementedError('have not finished function')
+    return
+
+def compute_cumulative_power_distribution(K):
+    w,_=np.linalg.eig(K)
+    return np.cumsum(w**2)/np.sum(w**2)

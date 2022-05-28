@@ -8,7 +8,7 @@ for j in 0.0
 do
 for k in 17
 do
-python compute_quantum_kernel_Sparse_IQP.py --outpath /mnt/c/Users/lslat/Data/QK_project/results/Sparse_IQPm/fashion-mnist/ --dataset-dim 18 --log-scaling-factor $i --log-int-scaling-factor $j --density $k --dataset fashion-mnist
+python compute_quantum_kernel_Sparse_IQP.py --outpath /mnt/c/Users/lslat/Data/QK_project/results/Sparse_IQPm/kmnist/ --dataset-dim 18 --log-scaling-factor $i --log-int-scaling-factor $j --density $k --dataset kmnist
 done
 done
 done
