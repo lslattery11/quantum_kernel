@@ -11,8 +11,7 @@ def s_complexity(K):
 
 #geometric difference (for generalization error) of kernel matrices. Eq. 5 from paper (See appendix F for inclusion of regularization parameter lambda.)
 #Note they reorder K1 and K2 in the appendix which is NOT the convention we follow here.
-#larger lam leads to smaller generalization geometric difference.
-#THE ORDER OF THE INPUTS MATTERS. TO prepare  notation prepares gcq(K2||K1)(main text notation)
+#THE ORDER OF THE INPUTS MATTERS. We use gcq(K2||K1) with the (main text notation)
 def geometric_difference(K2,K1,lam=0,tol=1e-3,**kwargs):
     assert(K1.shape==K2.shape),'K1 and K2 must be the same shape'
     assert(np.allclose(np.trace(K1),len(K1),atol=tol)),'K1 must be normalized Tr(K1)==N'
@@ -114,7 +113,7 @@ def compute_metric_matrix(df1: pd.DataFrame,df2: pd.DataFrame,metric,k=10):
     M=np.zeros((len(df2),len(df1)))
     assert(len(df1.columns)==2),'number of keys must be 2'
     assert(len(df2.columns)==2),'number of keys must be 2'
-    #get hyperparameter names#
+    #get hyperparameter names
     h1=np.setdiff1d(df1.columns.values,np.array(['qkern_matrix_train']))[0]
     h2=np.setdiff1d(df2.columns.values,np.array(['qkern_matrix_train']))[0]
     #sort DataFrame by hyper parameter

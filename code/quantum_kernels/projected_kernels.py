@@ -1,6 +1,5 @@
-from itertools import cycle
-from matplotlib.contour import QuadContourSet
 import numpy as np
+import time
 from typing import Optional, Union, Sequence, Mapping, List
 from qiskit.providers import Backend
 from qiskit.providers.aer import AerSimulator
@@ -12,8 +11,9 @@ from qiskit_machine_learning.exceptions import QiskitMachineLearningError
 
 class RDM1ProjectedKernel(QuantumKernel):
     """
-    Projected quantum kernel using a single qubit RDM. See Eq. L6 in https://arxiv.org/abs/2011.01938.
-    additional arguments for gamma (kernel bandwith) and measure_qubits
+    Projected quantum kernel using a single qubit RDM. See Eq. L6 in https://arxiv.org/abs/2011.01938. Currently
+    we are not calcuate late the trace distance between the RDMs in this kernel. Instead using <Z> of the rdm.
+    additional arguments for gamma (kernel bandwith) and measure_qubits. 
     """
     def __init__(
         self,
@@ -31,7 +31,6 @@ class RDM1ProjectedKernel(QuantumKernel):
 
     def construct_circuit(self,
         x: ParameterVector,
-        y: ParameterVector = None,
         measurement: bool = True,
         is_statevector_sim: bool = False,
     ):
@@ -58,60 +57,41 @@ class RDM1ProjectedKernel(QuantumKernel):
                 f"x has {len(x)} dimensions, but feature map has {self._feature_map.num_parameters}."
             )
         #create circuit for data x
-        qx = QuantumRegister(self._feature_map.num_qubits, "q")
-        cx = ClassicalRegister(self._feature_map.num_qubits, "c")
-        qcx = QuantumCircuit(qx, cx,name='qcx')
+        q = QuantumRegister(self._feature_map.num_qubits, "q")
+        c = ClassicalRegister(self._feature_map.num_qubits, "c")
+        qc = QuantumCircuit(q, c,name='qcx')
         x_dict = dict(zip(self._feature_map.parameters, x))
-        print(self.feature_map.parameters)
-        psi_x = self._feature_map.assign_parameters(x_dict)
-        qcx.append(psi_x.to_instruction(), qcx.qubits)
-        print(psi_x.parameters)
-        print(qcx.parameters)
-        #create circuit for data y
-        qy = QuantumRegister(self._feature_map.num_qubits, "q")
-        cy = ClassicalRegister(self._feature_map.num_qubits, "c")
-        qcy = QuantumCircuit(qy, cy,name='qcy')
-        if y is None:
-            y = x
-        y_dict = dict(zip(self._feature_map.parameters, y))
-        psi_y = self._feature_map.assign_parameters(y_dict)
-        qcy.append(psi_y.to_instruction(), qcy.qubits)
-        print(qcy.parameters)
+        psi = self._feature_map.assign_parameters(x_dict)
+        qc.append(psi.to_instruction(), qc.qubits)
         #add measurements to the appropriate qubits.
-        qcxs=[]
-        qcys=[]
-        if not is_statevector_sim and measurement:
-            qcx.barrier(qx)
-            qcy.barrier(qy)
-            #circuit
-            for i in self._measured_qubits:
-                new_qcx=qcx.copy(name=qcx.name+str(i))
-                new_qcx.measure(i,i)
-                qcxs.append(new_qcx)
-                new_qcy=qcy.copy(name=qcy.name+str(i))
-                new_qcy.measure(i,i)
-                qcys.append(new_qcy)
-        else:
-            raise ValueError(
-                "Still need to implement statevector_sim support for construct_circuit"
-            )
-        return qcxs,qcys
+        qcs=[]
+        #if not is_statevector_sim and measurement:
+        qc.barrier(q)
+        #circuit
+        for i in self._measured_qubits:
+            new_qc=qc.copy(name=qc.name+str(i))
+            new_qc.measure(i,i)
+            qcs.append(new_qc)
+        
+        return qc
 
 
-    def _compute_overlap(self, idx, results_x,results_y, is_statevector_sim, measurement_basis) -> float:
+    def _compute_overlap(self, idx_x,idx_y, results, is_statevector_sim, measurement_basis0, measurement_basis1) -> float:
         """
         Overrides parent class function. Instead of computing overlap, we wil compute
-        the projected kernel element.
+        the projected kernel element. Currently not doing a RDM but instead <Zx>-<Zy> for the rdm.
         """
-
         if is_statevector_sim:
             raise ValueError(
                "statevector_sim support for not implemented yet."
             )
         else:
-            result = results.get_counts(idx)
-
-            kernel_value = result.get(measurement_basis, 0) / sum(result.values())
+            result_x = results.get_counts(idx_x)
+            result_y = results.get_counts(idx_y)
+            Zx=(result_x.get(measurement_basis0,0)-result_x.get(measurement_basis1,0)) / (result_x.get(measurement_basis0,0)+result_x.get(measurement_basis1,0))
+            Zy=(result_y.get(measurement_basis0,0)-result_y.get(measurement_basis1,0)) / (result_y.get(measurement_basis0,0)+result_y.get(measurement_basis1,0))
+            #now compute kernel
+            kernel_value=np.exp(-self.gamma*np.linalg.norm(Zx-Zy)**2)
         return kernel_value
 
     def evaluate(self, x_vec: np.ndarray, y_vec: np.ndarray = None) -> np.ndarray:
@@ -224,63 +204,63 @@ class RDM1ProjectedKernel(QuantumKernel):
 
         is_statevector_sim = self._quantum_instance.is_statevector
         measurement = not is_statevector_sim
+        measurement_basis0 = "0"*self._feature_map.num_qubits
+        #bit flip for all measured qubits so that I can take <Zi...Zj> on the measured qubits. Note reverse of range(num_qubits) is used b/c qiskit has reverse convention
+        #than every paper, textbook & sane person ever.
+        measurement_basis1=""
+        measurement_basis1=measurement_basis1.join(["1" if idx in self._measured_qubits else "0" for idx in range(self._feature_map.num_qubits-1,-1,-1)])
 
+        if is_symmetric:
+            to_be_computed_data = x_vec
+        else:  # not symmetric
+            to_be_computed_data = np.concatenate((x_vec, y_vec))
+        #here we actually just want to compute the rdm tr_a(|psi><psi|O) for each unique data vector. Original design
+        #was for each pair to compute the reduced density matrices. but instead what we should do is just compute once and then pair up appropriately to form the kernel matrix.
+        #for now we will let O = Zi x Zj x Zk (i.e. a tensor product of z operators on the ith, jth and kth qubits) in order to get a working model.
+        #To change this we'd have to change which circuits we are constructing (i.e. add relevant rotation before a qubit in construct_circuit and change how the circuits are paired up when we want to compute the overlap)
         # calculate kernel
         if is_statevector_sim:  # using state vector simulator
             raise ValueError(
                "statevector_sim support for not implemented yet."
             )
-
-        else:  # not using state vector simulator
-            feature_map_params_x = ParameterVector("par_x", self._feature_map.num_parameters)
+            
+            feature_map_params = ParameterVector("par_x", self._feature_map.num_parameters)
             feature_map_params_y = ParameterVector("par_y", self._feature_map.num_parameters)
+
             parameterized_circuits_x,parameterized_circuits_y = self.construct_circuit(
                 feature_map_params_x,
                 feature_map_params_y,
                 measurement=measurement,
                 is_statevector_sim=is_statevector_sim,
             )
-            print(len(parameterized_circuits_y))
-            print(type(parameterized_circuits_y[0]))
             parameterized_circuits_x = self._quantum_instance.transpile(
                 parameterized_circuits_x, pass_manager=self._quantum_instance.unbound_pass_manager
             )
             parameterized_circuits_y = self._quantum_instance.transpile(
                 parameterized_circuits_y, pass_manager=self._quantum_instance.unbound_pass_manager
             )
-            print(type(parameterized_circuits_y[0]))
-            for idx in range(0, len(mus), self._batch_size):
-                to_be_computed_data_pair = []
-                to_be_computed_index = []
-                for sub_idx in range(idx, min(idx + self._batch_size, len(mus))):
-                    i = mus[sub_idx]
-                    j = nus[sub_idx]
-                    x_i = x_vec[i]
-                    y_j = y_vec[j]
-                    if not np.all(x_i == y_j):
-                        to_be_computed_data_pair.append((x_i, y_j))
-                        to_be_computed_index.append((i, j))
-                #need to change here.
-                print('here')
-                circuits_x = [[
+
+            statevectors = []
+
+            for min_idx in range(0, len(to_be_computed_data), self._batch_size):
+                max_idx = min(min_idx + self._batch_size, len(to_be_computed_data))
+                circuits_x = [
                     parameterized_circuits_x[idx].assign_parameters(
                         {feature_map_params_x: x}
                     )
-                    for idx in range(len(parameterized_circuits_x))
+                    for idx in range(len(parameterized_circuits_y))
+                
+                    for x in to_be_computed_data
                 ]
-                    for x, y in to_be_computed_data_pair
-                ]
-                print('here2')
-                circuits_y = [[
+
+                circuits_y = [
                     parameterized_circuits_y[idx].assign_parameters(
                         {feature_map_params_y: y}
                     )
                     for idx in range(len(parameterized_circuits_y))
+                
+                    for y in to_be_computed_data
                 ]
-                    for x, y in to_be_computed_data_pair
-                ]
-                print('here3')
-                print(circuits_y[0])
 
                 if self._quantum_instance.bound_pass_manager is not None:
                     circuits_x = self._quantum_instance.transpile(
@@ -289,26 +269,65 @@ class RDM1ProjectedKernel(QuantumKernel):
                     circuits_y = self._quantum_instance.transpile(
                         circuits_y, pass_manager=self._quantum_instance.bound_pass_manager
                     )
-                print(circuits_y[0])
                 results_x = self._quantum_instance.execute(circuits_x, had_transpiled=True)
                 results_y = self._quantum_instance.execute(circuits_y, had_transpiled=True)
-                #setting to None, can change if I it turns out I want to use a specific basis and deviate
-                #from the paper.
-                measurement_basis = None
                 return results_x,results_y
-            """                
-                matrix_elements = [
+                for j in range(max_idx - min_idx):
+                    statevectors.append(results.get_statevector(j))
 
-                    self._compute_overlap(idx, results_x,results_y, is_statevector_sim, measurement_basis)
-                    for idx in range(len(circuits_x))
+            offset = 0 if is_symmetric else len(x_vec)
+            matrix_elements = [
+                self._compute_overlap(idx, statevectors, is_statevector_sim, measurement_basis0,measurement_basis1)
+                for idx in list(zip(mus, nus + offset))
+            ]
+            #
+            for i, j, value in zip(mus, nus, matrix_elements):
+                kernel[i, j] = value
+                if is_symmetric:
+                    kernel[j, i] = kernel[i, j]
+        else:  # not using state vector simulator
+            feature_map_params = ParameterVector("par", self._feature_map.num_parameters)
+            #currently parameterized_circuits is just = [circuit] but will likely want to change in future. 
+            parameterized_circuits = self.construct_circuit(
+                feature_map_params,
+                measurement=measurement,
+                is_statevector_sim=is_statevector_sim,
+            )
 
-                ]
+            parameterized_circuits = self._quantum_instance.transpile(
+                parameterized_circuits, pass_manager=self._quantum_instance.unbound_pass_manager
+            )
+            for min_idx in range(0, len(to_be_computed_data), self._batch_size):
+                max_idx = min(min_idx + self._batch_size, len(to_be_computed_data))
+                circuits = [
+                        parameterized_circuits[idx].assign_parameters(
+                            {feature_map_params: x}
+                        )
+                        for idx in range(len(parameterized_circuits))
 
-                for (i, j), value in zip(to_be_computed_index, matrix_elements):
-                    kernel[i, j] = value
-                    if is_symmetric:
-                        kernel[j, i] = kernel[i, j]
+                        for x in to_be_computed_data
+                    ]
 
+                if self._quantum_instance.bound_pass_manager is not None:
+                        circuits = self._quantum_instance.transpile(
+                            circuits, pass_manager=self._quantum_instance.bound_pass_manager
+                        )
+
+                results = self._quantum_instance.execute(circuits, had_transpiled=True)
+                print(type(results))
+                #need to append results together.
+
+            offset = 0 if is_symmetric else len(x_vec)
+            matrix_elements = [
+                self._compute_overlap(idx_x,idx_y, results, is_statevector_sim, measurement_basis0,measurement_basis1)
+                
+                for idx in list(zip(mus, nus + offset))
+            ]
+            for i, j, value in zip(mus, nus, matrix_elements):
+                kernel[i, j] = value
+                if is_symmetric:
+                    kernel[j, i] = kernel[i, j]
+    
             if self._enforce_psd and is_symmetric:
                 # Find the closest positive semi-definite approximation to symmetric kernel matrix.
                 # The (symmetric) matrix should always be positive semi-definite by construction,
@@ -316,6 +335,4 @@ class RDM1ProjectedKernel(QuantumKernel):
                 # adjustment is only done if NOT using the statevector simulation.
                 D, U = np.linalg.eig(kernel)  # pylint: disable=invalid-name
                 kernel = U @ np.diag(np.maximum(0, D)) @ U.transpose()
- 
         return kernel
-            """
