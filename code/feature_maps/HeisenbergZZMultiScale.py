@@ -19,7 +19,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         lam0 : float = 1.0,
         lam1 : float = 1.0,
         lam2 : float = 1.0,
-        name: str = 'Heisenberg1D'
+        name: str = 'HZZMulti'
     ) -> None:
         super().__init__(name=name)
         self._num_qubits = feature_dim+1
