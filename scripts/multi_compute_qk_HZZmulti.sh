@@ -8,7 +8,7 @@ lam1=(0 0.01 0.1 1.0)
 lam2=(0 0.01 0.1 1.0)
 
 parallel \
-    --jobs 20 \
+    --jobs 17 \
     """
         python compute_quantum_kernel_HZZMulti.py --outpath /media/HomeData/lslattery/QK_project/results/hproj_HZZMulti/fashion-mnist/ \
         --dataset-dim {1} \
