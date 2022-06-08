@@ -10,7 +10,8 @@ lam2=(0 0.01 0.1 1.0)
 parallel \
     --jobs 20 \
     """
-        python compute_quantum_kernel_HZZMulti.py --outpath media/HomeData/lslattery/QK_project/results/hproj_HZZMulti/fashion-mnist/ --dataset-dim {1} \
+        python compute_quantum_kernel_HZZMulti.py --outpath /media/HomeData/lslattery/QK_project/results/hproj_HZZMulti/fashion-mnist/ \
+        --dataset-dim {1} \
         --n-trotter 10 \
         --evo-time 1 \
         --init-state 'Haar_random' \
