@@ -140,7 +140,7 @@ def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, bat
         quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=23))
     return QuantumKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size)
 
-def get_projected_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500,device='CPU',MPI=False):
+def get_projected_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500,gamma=1,device='CPU',MPI=False):
     """Builds my Qiskit projected QuantumKernel object
     with parameters passed directly to HamiltonianEvolutionFeatureMap
     """
@@ -153,15 +153,16 @@ def get_projected_quantum_kernel(FeatureMap, simulation_method='statevector', sh
         quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device))
     else:
         quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=23))
-    return RDM1ProjectedKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size)
+    return RDM1ProjectedKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size,gamma=gamma)
 
 
-def precomputed_kernel_GridSearchCV(K, y, Cs, n_splits=5, test_size=0.2, random_state=42):
+def precomputed_kernel_GridSearchCV(K, y, Cs, gs, n_splits=5, test_size=0.2, random_state=42):
     """A version of grid search CV, 
     but adapted for SVM with a precomputed kernel
     K (np.ndarray) : precomputed kernel
     y (np.array) : labels
     Cs (iterable) : list of values of C to try
+    gs (iterable) : list of values of gamma to try (if projected quantum kernel) else [0]
     return: optimal value of C
     """
     from sklearn.model_selection import ShuffleSplit
@@ -173,27 +174,33 @@ def precomputed_kernel_GridSearchCV(K, y, Cs, n_splits=5, test_size=0.2, random_
     
     best_score = float('-inf')
     best_C = None
+    best_g = None
 
     indices = np.arange(n)
     
-    for C in Cs:
-        # for each value of parameter, do K-fold
-        # The performance measure reported by k-fold cross-validation 
-        # is the average of the values computed in the loop
-        scores = []
-        ss = ShuffleSplit(n_splits=n_splits, test_size=test_size, random_state=random_state)
-        for train_index, test_index in ss.split(indices):
-            K_train = K[np.ix_(train_index,train_index)]
-            K_test = K[np.ix_(test_index, train_index)]
-            y_train = y[train_index]
-            y_test = y[test_index]
-            svc = SVC(kernel='precomputed', C=C)
-            svc.fit(K_train, y_train)
-            scores.append(svc.score(K_test, y_test))
-        if np.mean(scores) > best_score:
-            best_score = np.mean(scores)
-            best_C = C
-    return best_C
+    for g in gs:
+        for C in Cs:
+            # for each value of parameter, do K-fold
+            # The performance measure reported by k-fold cross-validation 
+            # is the average of the values computed in the loop
+            scores = []
+            ss = ShuffleSplit(n_splits=n_splits, test_size=test_size, random_state=random_state)
+            for train_index, test_index in ss.split(indices):
+                K_train = K[np.ix_(train_index,train_index)]
+                K_test = K[np.ix_(test_index, train_index)]
+                if g != 0:
+                    K_train = np.exp(-g*K_train)
+                    K_test = np.exp(-g*K_test)
+                y_train = y[train_index]
+                y_test = y[test_index]
+                svc = SVC(kernel='precomputed', C=C)
+                svc.fit(K_train, y_train)
+                scores.append(svc.score(K_test, y_test))
+            if np.mean(scores) > best_score:
+                best_score = np.mean(scores)
+                best_C = C
+                best_g = g
+    return best_C,best_g
 
 
 def precomputed_kernel_GridSearchCV_dumb(K, y, Cs):
@@ -222,7 +229,7 @@ def precomputed_kernel_GridSearchCV_dumb(K, y, Cs):
     return best_C
 
 # Results DataFrame management routines
-def get_additional_fields(row, datasets, dumb_CV):
+def get_additional_fields(row, datasets, dumb_CV,projected):
     """
     row (one row of pd.DataFrame)
     datasets (dict): maps from dataset_dim to preloaded (x_train, x_test, y_train, y_test)
@@ -230,10 +237,15 @@ def get_additional_fields(row, datasets, dumb_CV):
     x_train, x_test, y_train, y_test = datasets[row['dataset_dim']]
     assert(row['qkern_matrix_train'].shape == (len(x_train),len(x_train)))
     C_range = [0.006, 0.015, 0.03, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256, 512, 1024]
+    if projected==True:
+        gamma_range=np.logspace(-3,0,num=30)
+    else:
+        gamma_range=[0]
     if dumb_CV:
         C_opt = precomputed_kernel_GridSearchCV_dumb(row['qkern_matrix_train'], y_train, C_range)
+        gamma_opt=0
     else:
-        C_opt = precomputed_kernel_GridSearchCV(row['qkern_matrix_train'], y_train, C_range)
+        C_opt,gamma_opt = precomputed_kernel_GridSearchCV(row['qkern_matrix_train'], y_train, C_range,gamma_range)
 
     svc = SVC(kernel='precomputed', C=C_opt)
     svc.fit(row['qkern_matrix_train'], y_train)
@@ -246,27 +258,23 @@ def get_additional_fields(row, datasets, dumb_CV):
     n_support = svc.n_support_
     n_support_ave = np.mean(n_support)
     norm_K_id = np.linalg.norm(row['qkern_matrix_train'] - np.eye(row['qkern_matrix_train'].shape[0]))
+    return test_score, train_score, n_support, n_support_ave, C_opt, gamma_opt, norm_K_id
 
-
-    return test_score, train_score, n_support, n_support_ave, C_opt, norm_K_id
-
-def compute_additional_fields(df, dataset_name, dumb_CV=False,kernel_name=None):
+def compute_additional_fields(df, dataset_name, dumb_CV=False,kernel_name=None,projected=False):
     datasets = {}
     for dataset_dim in set(df['dataset_dim']):
         datasets[dataset_dim] = get_dataset(dataset_name, dataset_dim, 800, 200)
     
+    temp_name=df.progress_apply(lambda row: get_additional_fields(row, datasets, dumb_CV,projected),axis=1,result_type="expand",)
     df[[
         'test_score',
         'train_score', 
         'n_support',
         'n_support_ave',
         'C',
+        'proj_gamma',
         'norm(qkern_matrix_train - identity)',
-    ]] = df.progress_apply(
-        lambda row: get_additional_fields(row, datasets, dumb_CV),
-        axis=1,
-        result_type="expand",
-    )
+    ]] = temp_name
 
     df['kernel_name']=kernel_name
     return df

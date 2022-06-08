@@ -3,7 +3,7 @@ from qiskit import QuantumCircuit,QuantumRegister
 from qiskit.circuit.library.blueprintcircuit import BlueprintCircuit
 from qiskit.circuit import Parameter,ParameterVector
 
-class HeisenbergMultiScale1DFeatureMap(BlueprintCircuit):
+class HZZMultiscaleFeatureMap(BlueprintCircuit):
     """
     Feature map for time evolution of the 1D Heisenberg model. H = (need to think over appropraite choice). Time evolution is given by first order Suzuki-Trotter.
     Currently implemented with OBC as in Ruslan's original paper but I think PBC makes more sense for long-range interaction
@@ -56,11 +56,12 @@ class HeisenbergMultiScale1DFeatureMap(BlueprintCircuit):
     def construct_circuit(self,qr=None,inverse=False):
         params = ParameterVector(name='x', length=self._feature_dimension)
         qr=self.qregs[0]
-        qc = QuantumCircuit(qr)
+        qc=QuantumCircuit(qr)
 
         qc=self.construct_init_state(qc,qr)
         np.random.seed()
         for _ in range(self.n_trotter):
+            #J1-J2 non-data layer
             for q1 in range(self._feature_dimension):
                 q2=q1+1
                 if q2 >= self._num_qubits:
@@ -69,19 +70,28 @@ class HeisenbergMultiScale1DFeatureMap(BlueprintCircuit):
                 # XX
                 qc.h([qr[q1],qr[q2]])
                 qc.cx(qr[q1],qr[q2])
-                qc.rz(params[q1], qr[q2])
+                qc.rz(self.lam1, qr[q2])
                 qc.cx(qr[q1],qr[q2])
                 qc.h([qr[q1],qr[q2]])
                 # YY
                 qc.rx(np.pi/2, [qr[q1],qr[q2]])
                 qc.cx(qr[q1],qr[q2])
-                qc.rz(params[q1], qr[q2])
+                qc.rz(self.lam1, qr[q2])
                 qc.cx(qr[q1],qr[q2])
                 qc.rx(np.pi/2, [qr[q1],qr[q2]])
                 # ZZ
                 qc.cx(qr[q1],qr[q2])
-                qc.rz(params[q1], qr[q2])
+                qc.rz(self.lam1, qr[q2])
                 qc.cx(qr[q1],qr[q2])
+            #ZZ data layer
+            for q1 in range(self._feature_dimension):
+                for q2 in range(q1 + 1, self._feature_dimension):
+                    phase=self.lam2*(np.pi-params[q1])*(np.pi-params[q2])
+                    qc.h(qr[q1])
+                    qc.h(qr[q2])
+                    qc.cx(qr[q1],qr[q2])
+                    qc.p(phase,qr[q2])
+                    qc.cx(qr[q1],qr[q2])
         return qc
 
 

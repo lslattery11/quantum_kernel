@@ -10,7 +10,7 @@ import pickle
 from pathlib import Path
 from sklearn.svm import SVC
 
-from quantum_kernel.code.utils import get_dataset,get_quantum_kernel,self_product
+from quantum_kernel.code.utils import get_dataset,get_quantum_kernel,get_projected_quantum_kernel,self_product
 from quantum_kernel.code.feature_maps import IQP
 
 if __name__ == '__main__':
@@ -40,10 +40,24 @@ if __name__ == '__main__':
         required = True,
         choices=['fashion-mnist','kmnist','plasticc'],
         help = "dataset to use")
+    parser.add_argument(
+        "--projected",type=str,
+        required = False,
+        choices=['huang_proj',''],
+        default='',
+        help = "use projected quantum kernel or not?")
+
     args = parser.parse_args()
+
     scaling_factor=10**(args.log_scaling_factor)
     int_time_scale=10**(args.log_int_scaling_factor)
-    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}.p")
+
+    if args.projected != '':
+        proj='_'+args.projected
+    else:
+        proj=args.projected
+
+    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}.p")
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
         sys.exit()
@@ -61,7 +75,13 @@ if __name__ == '__main__':
 
     FeatureMap = IQP.Sparse_IQP(args.dataset_dim,density=args.density,data_map_func=self_product,int_time_scale=int_time_scale)
 
-    qkern = get_quantum_kernel(FeatureMap,device='CPU')
+    if args.projected=='':
+        qkern = get_quantum_kernel(FeatureMap,device='CPU',batch_size=50)
+    else:
+        qkern = get_projected_quantum_kernel(FeatureMap,device='CPU',simulation_method='statevector',batch_size=10)
+        mq=[[i] for i in range(args.dataset_dim)]
+        qkern.set_measured_qubits(mq)
+
     qkern_matrix_train = qkern.evaluate(x_vec=x_train)
     t1 = time.time()
     K_train_time = t1-t0
@@ -84,6 +104,8 @@ if __name__ == '__main__':
             'args' : args,
             'K_train_time' : K_train_time,
             'K_test_time' : K_test_time,
+            'rdms' : rdms
     }
+
     pickle.dump(res, open(outpath, 'wb'))
     print(f"Dumped the result to {outpath}")

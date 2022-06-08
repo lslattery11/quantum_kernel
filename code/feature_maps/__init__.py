@@ -1,2 +1,2 @@
-__all__ = ['IQP','Heisenberg']
+__all__ = ['IQP','Heisenberg','HeisenbergZZMultiScale']
 from . import *

@@ -100,12 +100,6 @@ class Heisenberg1DFeatureMap(BlueprintCircuit):
             for i,qreg in enumerate(qr):
                 if np.random.randint(0, 2):
                     qc.x(qreg)
-        elif init_state == 'X_random':
-            # random X rotation on each qubit basis state
-            random_params = np.random.uniform(size=(self._feature_dimension))
-            for i,qreg in enumerate(qr):
-                if np.random.randint(0, 2):
-                    qc.rx(random_params[i], qreg)
         else:
             raise ValueError(f"Unknown initial state init_state={init_state}")
         return qc
