@@ -177,7 +177,7 @@ def purity_average(rdms,size=2):
         traces=[]
         for rdm in rdms[:,i]:
             traces.append(np.trace(rdm @ rdm))
-        purity_average[i]=np.average(traces)
+        purity_average[i]=np.real(np.average(traces))
     return purity_average
 
 #return purity_of_average, a np.array with shape ((rdms.shape[1],)) where the elements are
@@ -187,6 +187,6 @@ def purity_of_average(rdms,size=2):
     purity_of_average=np.zeros((rdms.shape[1],))
     for i in range(len(purity_of_average)):
         rdm_avg=1/rdms.shape[0]*np.sum(rdms[:,i],axis=0)
-        purity_of_average[i]=np.trace(rdm_avg @ rdm_avg)
+        purity_of_average[i]=np.real(np.trace(rdm_avg @ rdm_avg))
     return purity_of_average
 

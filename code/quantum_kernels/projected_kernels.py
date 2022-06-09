@@ -221,8 +221,9 @@ class RDM1ProjectedKernel(QuantumKernel):
         kernel = np.zeros((x_vec.shape[0], y_vec.shape[0]))
 
         # set diagonal to 1 if symmetric
+        # here is a major change!!!!!!. Projected kernels measure distance not similarity so diagonal should be 0.
         if is_symmetric:
-            np.fill_diagonal(kernel, 1)
+            np.fill_diagonal(kernel, 0)
 
         # get indices to calculate
         if is_symmetric:
