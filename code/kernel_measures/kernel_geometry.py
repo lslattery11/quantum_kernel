@@ -144,3 +144,49 @@ def compute_task_model_alignment(K,target):
 def compute_cumulative_power_distribution(K):
     w,_=np.linalg.eig(K)
     return np.cumsum(w**2)/np.sum(w**2)
+
+#return tdm_average, a np.array with shape ((rdms.shape[1],)) where the elements are
+# tdm_average[i]=<np.trace(rdm[:,i]-mixed_state)>
+#better way to do this with np.array without for loops but doesn't matter for our purposes.
+def tdm_average(rdms,size=2):
+    mixed_state=1/size*np.eye(size)
+    tdm_average=np.zeros((rdms.shape[1],))
+    for i in range(len(tdm_average)):
+        traces=[]
+        for rdm in rdms[:,i]:
+            traces.append(np.trace(rdm-mixed_state))
+        tdm_average[i]=np.average(traces)
+    return tdm_average
+
+#return tdm_of_average, a np.array with shape ((rdms.shape[1],)) where the elements are
+# tdm_of_average[i]=np.trace(<rdm[:,i]>-mixed_state)
+def tdm_of_average(rdms,size=2):
+    mixed_state=1/size*np.eye(size)
+    tdm_of_average=np.zeros((rdms.shape[1],))
+    for i in range(len(tdm_of_average)):
+        rdm_avg=1/rdms.shape[0]*np.sum(rdms[:,i],axis=0)
+        tdm_of_average[i]=np.trace(rdm_avg-mixed_state)
+    return tdm_of_average
+
+#return purity_average, a np.array with shape ((rdms.shape[1],)) where the elements are
+# purity_average[i]=<np.trace(rdm[:,i]^2)>
+#better way to do this with np.array without for loops but doesn't matter for our purposes.
+def purity_average(rdms,size=2):
+    purity_average=np.zeros((rdms.shape[1],))
+    for i in range(len(purity_average)):
+        traces=[]
+        for rdm in rdms[:,i]:
+            traces.append(np.trace(rdm @ rdm))
+        purity_average[i]=np.average(traces)
+    return purity_average
+
+#return purity_of_average, a np.array with shape ((rdms.shape[1],)) where the elements are
+# purity_of_average[i]=np.trace(<rdm[:,i]>^2)
+#better way to do this with np.array without for loops but doesn't matter for our purposes.
+def purity_of_average(rdms,size=2):
+    purity_of_average=np.zeros((rdms.shape[1],))
+    for i in range(len(purity_of_average)):
+        rdm_avg=1/rdms.shape[0]*np.sum(rdms[:,i],axis=0)
+        purity_of_average[i]=np.trace(rdm_avg @ rdm_avg)
+    return purity_of_average
+

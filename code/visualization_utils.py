@@ -64,3 +64,11 @@ def aggregate_folder(folder,dataset_name,kernel_name):
     else:
         dfs[label]['Number of qubits'] = dfs[label]['dataset_dim'] + 1
     return dfs
+
+def filter_df(
+    df: pd.DataFrame,
+    df_filter_dict: dict,
+    ):
+
+    filtered_df=df.loc[(df[list(df_filter_dict)] == pd.Series(df_filter_dict)).all(axis=1)]
+    return filtered_df

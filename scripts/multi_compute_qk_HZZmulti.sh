@@ -4,8 +4,8 @@ export PYTHONPATH=${PYTHONPATH}:/mnt/c/Users/lslat/QiskitProjects/VariationalWav
 export PYTHONPATH=${PYTHONPATH}:/media/HomeData/lslattery/
 
 data_dim=(4 6 8 10 12)
-lam1=(0 0.01 0.1 1.0)
-lam2=(0 0.01 0.1 1.0)
+lam1=(0 0.01 0.025 0.1 0.25 1.0)
+lam2=(0 0.01 0.025 0.1 0.25 1.0)
 
 parallel \
     --jobs 17 \
