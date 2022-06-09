@@ -294,10 +294,8 @@ class RDM1ProjectedKernel(QuantumKernel):
 
             matrix_elements = [
                     self._compute_overlap(i, j, rdms, is_statevector_sim)
-                
                     for i,j in zip(mus,nus)
                 ]
-
         else:  # not using state vector simulator
             raise NotImplementedError('Only statevector support is currently implemented.')
             feature_map_params = ParameterVector("par", self._feature_map.num_parameters)
@@ -345,7 +343,7 @@ class RDM1ProjectedKernel(QuantumKernel):
             if is_symmetric:
                 kernel[j, i] = kernel[i, j]
 
-        if self._enforce_psd and is_symmetric:
+        if self._enforce_psd and is_symmetric and not is_statevector_sim:
             # Find the closest positive semi-definite approximation to symmetric kernel matrix.
             # The (symmetric) matrix should always be positive semi-definite by construction,
             # but this can be violated in case of noise, such as sampling noise, thus the
