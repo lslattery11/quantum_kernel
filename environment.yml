@@ -9,7 +9,7 @@ dependencies:
   - numpy
   - pandas
   - seaborn
-  - pip:
+  - pip --user:
     - matplotlib
     - scikit-learn==0.24.1
     - scipy==1.6.1
