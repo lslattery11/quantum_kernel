@@ -9,14 +9,14 @@ dependencies:
   - numpy
   - pandas
   - seaborn
-  - pip:
-    - matplotlib
-    - scikit-learn==0.24.1
-    - scipy==1.6.1
+  - matplotlib
+  - scikit-learn==0.24.1
+  - scipy==1.6.1
+  - tqdm==4.61.2
+  - numexpr==2.7.1
+  - ipykernel
+   - pip:
     - qiskit==0.36.1
     - qiskit-machine-learning==0.4.0
     - qiskit-aer-gpu==0.8.2
-    - tqdm==4.61.2
-    - numexpr==2.7.1
-    - ipykernel
     ##- mpi4py==3.1.3
