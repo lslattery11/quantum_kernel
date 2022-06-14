@@ -5,11 +5,11 @@ channels:
   - conda-forge
 dependencies:
   - python==3.9
-  - pip3
+  - pip
   - numpy
   - pandas
   - seaborn
-  - pip3:
+  - pip:
     - matplotlib
     - scikit-learn==0.24.1
     - scipy==1.6.1
