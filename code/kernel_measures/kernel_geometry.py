@@ -171,7 +171,7 @@ def tdm_of_average(rdms,size=2):
 #return purity_average, a np.array with shape ((rdms.shape[1],)) where the elements are
 # purity_average[i]=<np.trace(rdm[:,i]^2)>
 #better way to do this with np.array without for loops but doesn't matter for our purposes.
-def purity_average(rdms,size=2):
+def purity_average(rdms):
     purity_average=np.zeros((rdms.shape[1],))
     for i in range(len(purity_average)):
         traces=[]
@@ -183,7 +183,7 @@ def purity_average(rdms,size=2):
 #return purity_of_average, a np.array with shape ((rdms.shape[1],)) where the elements are
 # purity_of_average[i]=np.trace(<rdm[:,i]>^2)
 #better way to do this with np.array without for loops but doesn't matter for our purposes.
-def purity_of_average(rdms,size=2):
+def purity_of_average(rdms):
     purity_of_average=np.zeros((rdms.shape[1],))
     for i in range(len(purity_of_average)):
         rdm_avg=1/rdms.shape[0]*np.sum(rdms[:,i],axis=0)

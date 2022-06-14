@@ -202,34 +202,8 @@ def precomputed_kernel_GridSearchCV(K, y, Cs, gs, n_splits=5, test_size=0.2, ran
                 best_g = g
     return best_C,best_g
 
-
-def precomputed_kernel_GridSearchCV_dumb(K, y, Cs):
-    """A version of grid search CV, 
-    but adapted for SVM with a precomputed kernel
-    K (np.ndarray) : precomputed kernel
-    y (np.array) : labels
-    Cs (iterable) : list of values of C to try
-    return: optimal value of C
-    """
-    n = K.shape[0]
-    assert len(K.shape) == 2
-    assert K.shape[1] == n
-    assert len(y) == n
-    
-    best_score = float('-inf')
-    best_C = None
-
-    for C in Cs:
-        svc = SVC(kernel='precomputed', C=C)
-        svc.fit(K, y)
-        score = svc.score(K, y)
-        if score > best_score:
-            best_score = score
-            best_C = C
-    return best_C
-
 # Results DataFrame management routines
-def get_additional_fields(row, datasets, dumb_CV,projected):
+def get_additional_fields(row, datasets,projected):
     """
     row (one row of pd.DataFrame)
     datasets (dict): maps from dataset_dim to preloaded (x_train, x_test, y_train, y_test)
@@ -237,35 +211,40 @@ def get_additional_fields(row, datasets, dumb_CV,projected):
     x_train, x_test, y_train, y_test = datasets[row['dataset_dim']]
     assert(row['qkern_matrix_train'].shape == (len(x_train),len(x_train)))
     C_range = [0.006, 0.015, 0.03, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256, 512, 1024]
+
     if projected==True:
-        gamma_range=np.logspace(-3,0,num=30)
+        gamma_range=np.logspace(-2,0,num=15)
     else:
         gamma_range=[0]
-    if dumb_CV:
-        C_opt = precomputed_kernel_GridSearchCV_dumb(row['qkern_matrix_train'], y_train, C_range)
-        gamma_opt=0
+
+    C_opt,gamma_opt = precomputed_kernel_GridSearchCV(row['qkern_matrix_train'], y_train, C_range,gamma_range)
+    
+    if projected==True:
+        kernel_train=np.exp(-gamma_opt*row['qkern_matrix_train'])
+        kernel_test=np.exp(-gamma_opt*row['qkern_matrix_test'])
     else:
-        C_opt,gamma_opt = precomputed_kernel_GridSearchCV(row['qkern_matrix_train'], y_train, C_range,gamma_range)
+        kernel_train=row['qkern_matrix_train']
+        kernel_test=row['qkern_matrix_test']
 
     svc = SVC(kernel='precomputed', C=C_opt)
-    svc.fit(row['qkern_matrix_train'], y_train)
-    y_pred_train = svc.predict(row['qkern_matrix_train'])
+    svc.fit(kernel_train, y_train)
+    y_pred_train = svc.predict(kernel_train)
     train_score = balanced_accuracy_score(y_train,y_pred_train)
 
-    y_pred_test = svc.predict(row['qkern_matrix_test'])
+    y_pred_test = svc.predict(kernel_test)
     test_score = balanced_accuracy_score(y_test,y_pred_test)
 
     n_support = svc.n_support_
     n_support_ave = np.mean(n_support)
-    norm_K_id = np.linalg.norm(row['qkern_matrix_train'] - np.eye(row['qkern_matrix_train'].shape[0]))
+    norm_K_id = np.linalg.norm(kernel_train - np.eye(kernel_train.shape[0]))
     return test_score, train_score, n_support, n_support_ave, C_opt, gamma_opt, norm_K_id
 
-def compute_additional_fields(df, dataset_name, dumb_CV=False,kernel_name=None,projected=False):
+def compute_additional_fields(df, dataset_name,kernel_name=None,projected=False):
     datasets = {}
     for dataset_dim in set(df['dataset_dim']):
         datasets[dataset_dim] = get_dataset(dataset_name, dataset_dim, 800, 200)
     
-    temp_name=df.progress_apply(lambda row: get_additional_fields(row, datasets, dumb_CV,projected),axis=1,result_type="expand",)
+    temp_name=df.progress_apply(lambda row: get_additional_fields(row, datasets,projected),axis=1,result_type="expand",)
     df[[
         'test_score',
         'train_score', 

@@ -14,7 +14,7 @@ tqdm.pandas()
 
 from quantum_kernel.code.utils import compute_additional_fields
 
-def aggregate_pickles(all_pickles_paths, dataset_name,kernel_name):
+def aggregate_pickles(all_pickles_paths, dataset_name,kernel_name,projected=False):
     all_res = []
     
     for fname in all_pickles_paths:
@@ -28,13 +28,13 @@ def aggregate_pickles(all_pickles_paths, dataset_name,kernel_name):
         all_res.append(res)
 
     df_all = pd.DataFrame(all_res, columns=all_res[0].keys())
-    df_all = compute_additional_fields(df_all, dataset_name=dataset_name,kernel_name=kernel_name)
-    ##df_all.drop(columns=['qkern_matrix_train', 'qkern_matrix_test'], inplace=True)
+    df_all = compute_additional_fields(df_all, dataset_name=dataset_name,kernel_name=kernel_name,projected=projected)
     return df_all   
 
 #ugly should rewrite eventually
-def aggregate_folder(folder,dataset_name,kernel_name):
+def aggregate_folder(folder,dataset_name,kernel_name,projected=False):
     dfs={}
+
     label = Path(folder).stem
     if "Sparse_IQP" in folder:
         prefix = "Sparse_IQP"
@@ -53,22 +53,22 @@ def aggregate_folder(folder,dataset_name,kernel_name):
             print(f"For {folder}, using aggregated pickle from {path_aggregated}")
             dfs[label] = copy.deepcopy(aggregated_df)
     if must_reaggregate:
-        aggregated_df = aggregate_pickles(all_pickles_paths, dataset_name,kernel_name)
+        aggregated_df = aggregate_pickles(all_pickles_paths, dataset_name,kernel_name,projected=projected)
         dfs[label] = copy.deepcopy(aggregated_df)
         print(f"For {folder}, saving aggregated pickle in {path_aggregated}")
         pickle.dump(aggregated_df, open(path_aggregated, "wb"))
     dfs[label] = dfs[label][dfs[label]['dataset_dim'] <= 22] 
+
     if "Sparse_IQP" in folder:
         dfs[label]['Number of qubits'] = dfs[label]['dataset_dim']
-    #will have to change this for new feature maps.
     else:
         dfs[label]['Number of qubits'] = dfs[label]['dataset_dim'] + 1
     return dfs
 
+#return df with filter applied.
 def filter_df(
     df: pd.DataFrame,
     df_filter_dict: dict,
     ):
-
     filtered_df=df.loc[(df[list(df_filter_dict)] == pd.Series(df_filter_dict)).all(axis=1)]
     return filtered_df

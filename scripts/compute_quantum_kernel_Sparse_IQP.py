@@ -77,12 +77,15 @@ if __name__ == '__main__':
 
     if args.projected=='':
         qkern = get_quantum_kernel(FeatureMap,device='CPU',batch_size=50)
+        qkern_matrix_train = qkern.evaluate(x_vec=x_train)
+        rdms=None
+
     else:
         qkern = get_projected_quantum_kernel(FeatureMap,device='CPU',simulation_method='statevector',batch_size=10)
         mq=[[i] for i in range(args.dataset_dim)]
         qkern.set_measured_qubits(mq)
+        qkern_matrix_train,rdms = qkern.evaluate(x_vec=x_train,return_rdms=True)
 
-    qkern_matrix_train = qkern.evaluate(x_vec=x_train)
     t1 = time.time()
     K_train_time = t1-t0
     print(f"Done computing K_train in {K_train_time}")
