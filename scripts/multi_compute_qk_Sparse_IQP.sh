@@ -9,10 +9,10 @@ parallel \
     --jobs 17 \
     """
         python compute_quantum_kernel_Sparse_IQP.py --outpath /media/HomeData/lslattery/QK_project/results/hproj_Sparse_IQP/fashion-mnist/ \
-        --dataset-dim 10 \
+        --dataset-dim 18 \
         --log-scaling-factor {1} \
         --log-int-scaling-factor 0.0 \
-        --density 9 \
+        --density 17 \
         --dataset fashion-mnist \
         --projected huang_proj
     """ ::: "${lsf[@]}"
