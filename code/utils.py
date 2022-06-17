@@ -213,7 +213,7 @@ def get_additional_fields(row, datasets,projected):
     C_range = [0.006, 0.015, 0.03, 0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256, 512, 1024]
 
     if projected==True:
-        gamma_range=np.logspace(-2,0,num=15)
+        gamma_range=np.linspace(0,100,num=40)
     else:
         gamma_range=[0]
 
