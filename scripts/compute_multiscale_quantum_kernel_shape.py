@@ -11,7 +11,10 @@ from pathlib import Path
 import numpy as np
 
 from quantum_kernel.code.utils import get_dataset,get_quantum_kernel,get_projected_quantum_kernel,self_product
-from quantum_kernel.code.feature_maps import IQP
+from quantum_kernel.code.feature_maps import HeisenbergZZMultiScale
+
+np.random.seed(0)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -24,35 +27,60 @@ if __name__ == '__main__':
         required = True,
         help = "dimensionality (number of qubits)")
     parser.add_argument(
-        "--log-scaling-factor", type = float,
+        "--n-trotter", type =int,
         required = True,
-        help = "scale all data by this factor")
+        help = "number of trotter steps")
     parser.add_argument(
-        "--log-int-scaling-factor", type=float,
+        "--evo-time", type=float,
         required=True,
         help = "scale all two qubit interactions by this factor")
     parser.add_argument(
-        "--density", type = int,
+        "--init-state", type = str,
         required = True,
-        help = "number of two qubit connections per qubit in each layer")
+        help = "initial state for the Hamiltonian evolution feature map")
+    parser.add_argument(
+        "--init-state-seed", type = int,
+        required = True,
+        help = "the seed used for the random initial state")
+    parser.add_argument(
+        "--lam1", type = float,
+        required = True,
+        help = "non-data interaction term scale")
+    parser.add_argument(
+        "--lam2", type = float,
+        required = True,
+        help = "data interaction term scale")
+    parser.add_argument(
+        "--decimals", type = int,
+        required = False,
+        default=None,
+        help = "number of decimal points to keep (passed directly to np.round)")
     parser.add_argument(
         "--projected",type=str,
         required = False,
-        choices=['huang_proj','single_proj',''],
+        choices=['huang_proj',''],
         default='',
         help = "use projected quantum kernel or not?")
-
+    parser.add_argument(
+        "--simulation-method", type = str,
+        required = False,
+        default="statevector",
+        help = "simulation method to use (passed directly to qiskit)")
+    parser.add_argument(
+        "--shots", type = int,
+        required = False,
+        default=1,
+        help = "number of shots to use (passed directly to qiskit)")
     args = parser.parse_args()
-
-    scaling_factor=10**(args.log_scaling_factor)
-    int_time_scale=10**(args.log_int_scaling_factor)
 
     if args.projected != '':
         proj='_'+args.projected
     else:
         proj=args.projected
 
-    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}_shape_test.p")
+    outpath = Path(args.outpath, f"MultiScale_{args.dataset_dim}{proj}_ntrot_{args.n_trotter}_evo_t_{args.evo_time}_init_{args.init_state}_s_{args.init_state_seed}_l1_{args.lam1}_l2_{args.lam2}_dec_{args.decimals}_{args.simulation_method}_shape_test.p")
+
+
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
         sys.exit()
@@ -76,10 +104,8 @@ if __name__ == '__main__':
 
     norm_diffs=np.linalg.norm(y_vec-x_train,axis=1)
 
-    x_train *= scaling_factor
-    y_vec *= scaling_factor
 
-    FeatureMap = IQP.Sparse_IQP(args.dataset_dim,density=args.density,data_map_func=self_product,int_time_scale=int_time_scale)
+    FeatureMap = HeisenbergZZMultiScale.HZZMultiscaleFeatureMap(args.dataset_dim,args.n_trotter,args.evo_time,args.init_state,args.init_state_seed,0,args.lam1,args.lam2)
 
     if args.projected=='':
         qkern = get_quantum_kernel(FeatureMap,device='CPU',batch_size=50)
