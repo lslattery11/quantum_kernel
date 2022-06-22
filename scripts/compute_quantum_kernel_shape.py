@@ -93,8 +93,6 @@ if __name__ == '__main__':
 
     elif args.projected=='single_proj':
         qkern = get_projected_quantum_kernel(FeatureMap,device='CPU',simulation_method='statevector',batch_size=10)
-        #mq=[[i] for i in range(args.dataset_dim)]
-        #qkern.set_measured_qubits(mq)
         qkern_matrix_train,rdms = qkern.evaluate(x_vec=x_train,y_vec=y_vec,return_rdms=True)
 
 

@@ -65,6 +65,24 @@ def aggregate_folder(folder,dataset_name,kernel_name,projected=False):
         dfs[label]['Number of qubits'] = dfs[label]['dataset_dim'] + 1
     return dfs
 
+#
+def aggregate_shapes(folder,prefix):
+    all_pickles_paths = list(Path(folder).glob(f"{prefix}*.p"))
+    all_res = []
+    for fname in all_pickles_paths:
+        try:
+            res = pickle.load(open(fname,'rb'))
+        except (AttributeError, EOFError, TypeError) as e:
+            print(e)
+            print(fname)
+            continue
+        res.update(vars(res['args']))
+        all_res.append(res)
+
+    df_all = pd.DataFrame(all_res, columns=all_res[0].keys())
+
+    return df_all
+
 #return df with filter applied.
 def filter_df(
     df: pd.DataFrame,

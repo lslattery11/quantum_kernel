@@ -146,7 +146,6 @@ def get_projected_quantum_kernel(FeatureMap, simulation_method='statevector', sh
     """
     from qiskit.providers.aer import AerSimulator
     from qiskit.utils import QuantumInstance
-    from qiskit_machine_learning.kernels import QuantumKernel
     if simulation_method == 'statevector' and shots != 1:
         raise ValueError(f'With simulation method {simulation_method} no shots are allowed')
     if MPI==False:
