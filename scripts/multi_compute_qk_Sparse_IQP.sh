@@ -29,7 +29,7 @@ parallel \
         --int-scaling-factor 1.0 \
         --density 0 \
         --beta 1.0 \
-        --projected 
+        --projected ''
     """ ::: "${sf[@]}" ::: "${dim[@]}"
 
 sf=(0.01 0.025 0.05 0.1 0.25 0.5 1.0)
@@ -43,5 +43,5 @@ parallel \
         --int-scaling-factor 1.0 \
         --density {2}-1 \
         --beta 1.0 \
-        --projected 
+        --projected ''
     """ ::: "${sf[@]}" ::: "${dim[@]}"
