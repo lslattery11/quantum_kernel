@@ -38,10 +38,10 @@ parallel \
     --jobs 14 \
     """
         python compute_Sparse_IQP_kernel_gennorm_data.py --outpath ~/QK_project/results/Sparse_IQP/gennorm/ \
-        --dataset-dim $2 \
-        --scaling-factor $1 \
+        --dataset-dim {2} \
+        --scaling-factor {1} \
         --int-scaling-factor 1.0 \
-        --density $(($2-1)) \
+        --density $((${2}-1)) \
         --beta 1.0 \
         --projected ''
     """ ::: "${sf[@]}" ::: "${dim[@]}"
