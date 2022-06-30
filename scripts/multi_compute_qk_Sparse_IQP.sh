@@ -21,9 +21,9 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 sf=(0.01 0.025 0.05 0.1 0.25 0.5)
 dim=(4 8 12 16)
 parallel \
-    --jobs 2 \
+    --jobs 14 \
     """
-        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath ~/QK_project/results/ \
+        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath ~/QK_project/results/Sparse_IQP/gennorm/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor 1.0 \
