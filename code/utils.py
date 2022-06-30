@@ -9,6 +9,7 @@ from sklearn.svm import SVC
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 from functools import reduce
+from scipy import stats
 
 from quantum_kernel.code.quantum_kernels.projected_kernels import RDM1ProjectedKernel
 
@@ -128,7 +129,7 @@ def get_gennorm_samples(beta,dim,num_samples,seed=0):
     np.random.seed(seed)
     samples=np.zeros((num_samples,dim))
     for i in range(num_samples):
-        sample=scipy.stats.gennorm(beta).rvs(dim)
+        sample=stats.gennorm(beta).rvs(dim)
         samples[i]=sample
     return samples
 
