@@ -124,6 +124,13 @@ def get_dataset(name, dataset_dim, n_train, n_test):
     else:
         raise ValueError(f"Unknown dataset: {name}")
 
+def get_gennorm_samples(beta,dim,num_samples,seed=0):
+    np.random.seed(seed)
+    samples=np.zeros((num_samples,dim))
+    for i in range(num_samples):
+        sample=scipy.stats.gennorm(beta).rvs(dim)
+        samples[i]=sample
+    return samples
 
 def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500,device='CPU',MPI=False):
     """Builds Qiskit QuantumKernel object 
