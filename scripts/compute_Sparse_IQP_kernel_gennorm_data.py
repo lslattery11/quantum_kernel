@@ -63,9 +63,11 @@ if __name__ == '__main__':
     print(scaling_factor)
     print(int_time_scale)
     print(args.density)
-    
-    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}.p")
-    
+
+    #outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}.p")
+    outpath = Path(args.outpath, "test.p")
+
+
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
         sys.exit()
