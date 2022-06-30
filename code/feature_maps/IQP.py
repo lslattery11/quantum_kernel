@@ -79,6 +79,7 @@ def get_entanglement(connectivity,density,num_qubits):
         if density=='max':
             entanglement=connectivity
         else:
+            density=min(density,num_qubits-1)
             entanglement=[]
             #0th index of entanglement is just single # tuples for each qubit.
             qubits=[(qubit,) for qubit in range(0,num_qubits)]

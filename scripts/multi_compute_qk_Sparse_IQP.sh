@@ -41,7 +41,7 @@ parallel \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor 1.0 \
-        --density $((${2}-1)) \
+        --density {2} \
         --beta 1.0 \
         --projected ''
     """ ::: "${sf[@]}" ::: "${dim[@]}"
