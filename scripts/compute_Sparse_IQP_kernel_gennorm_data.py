@@ -79,7 +79,7 @@ if __name__ == '__main__':
     samples=(samples-mu)/sigma
     #rescale using IQP parameter
     samples *= scaling_factor 
-
+    
     FeatureMap = IQP.Sparse_IQP(args.dataset_dim,density=args.density,data_map_func=self_product,int_time_scale=int_time_scale)
 
     if args.projected=='':
