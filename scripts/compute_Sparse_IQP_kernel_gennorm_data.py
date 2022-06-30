@@ -58,7 +58,7 @@ if __name__ == '__main__':
     else:
         proj=args.projected
 
-    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}.p")
+    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}_beta_{args.beta}.p")
 
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     samples=(samples-mu)/sigma
     #rescale using IQP parameter
     samples *= scaling_factor 
-    
+
     FeatureMap = IQP.Sparse_IQP(args.dataset_dim,density=args.density,data_map_func=self_product,int_time_scale=int_time_scale)
 
     if args.projected=='':
