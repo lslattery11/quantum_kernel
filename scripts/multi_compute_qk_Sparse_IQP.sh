@@ -17,14 +17,6 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 #         --dataset plasticc \
 #         --projected huang_proj
 #     """ ::: "${lsf[@]}"
-python compute_Sparse_IQP_kernel_gennorm_data.py --outpath ~/QK_project/results/Sparse_IQP/gennorm/ \
---dataset-dim 8 \
---scaling-factor 1.0 \
---int-scaling-factor 1.0 \
---density 0 \
---beta 1.0 \
---projected 
-
 
 sf=(0.01 0.025 0.05 0.1 0.25 0.5 1.0)
 dim=(4 8 12 16)
@@ -36,6 +28,20 @@ parallel \
         --scaling-factor {1} \
         --int-scaling-factor 1.0 \
         --density 0 \
+        --beta 1.0 \
+        --projected 
+    """ ::: "${sf[@]}" ::: "${dim[@]}"
+
+sf=(0.01 0.025 0.05 0.1 0.25 0.5 1.0)
+dim=(4 8 12 16)
+parallel \
+    --jobs 14 \
+    """
+        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath ~/QK_project/results/Sparse_IQP/gennorm/ \
+        --dataset-dim {2} \
+        --scaling-factor {1} \
+        --int-scaling-factor 1.0 \
+        --density {2}-1 \
         --beta 1.0 \
         --projected 
     """ ::: "${sf[@]}" ::: "${dim[@]}"
