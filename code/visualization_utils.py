@@ -66,7 +66,7 @@ def aggregate_folder(folder,dataset_name,kernel_name,projected=False):
     return dfs
 
 #
-def aggregate_shapes(folder,prefix):
+def aggregate_shapes(folder,prefix,return_dataframe=True):
     all_pickles_paths = list(Path(folder).glob(f"{prefix}*.p"))
     all_res = []
     for fname in all_pickles_paths:
@@ -80,8 +80,8 @@ def aggregate_shapes(folder,prefix):
         all_res.append(res)
 
     df_all = pd.DataFrame(all_res, columns=all_res[0].keys())
-
-    return df_all
+    if return_dataframe==True:
+        return df_all
 
 #return df with filter applied.
 def filter_df(

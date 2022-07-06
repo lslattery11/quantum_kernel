@@ -22,7 +22,7 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 sf=(0.15 0.2 0.3 0.35 0.4 0.5 0.6 0.7 0.8 0.9)
 dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
 #beta=(0.05 0.1 0.2 0.5 1.0 5.0)
-beta=(0.1 1.0)
+beta=(0.1 1.0 2.0)
 
 parallel \
     --jobs 14 \
