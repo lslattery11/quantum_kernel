@@ -22,7 +22,7 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 sf=$(cat logspace-2.1.30.txt)
 dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
 beta=(0.1 1.0 2.0)
-seed = (10 1200 33 4 210)
+seed=(10 1200 33 4 210)
 # parallel \
 #     --jobs 14 \
 #     """
