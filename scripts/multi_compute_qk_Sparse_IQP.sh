@@ -19,7 +19,7 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 #     """ ::: "${lsf[@]}"
 
 #sf=(0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.1 0.2 0.3 0.4 0.5 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0)
-sf=$(cat logspace-2.1.30.txt)
+mapfile -t sf < logspace-2.1.30.txt
 dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
 beta=(0.1 1.0 2.0)
 seed=(10 1200 33 4 210)
