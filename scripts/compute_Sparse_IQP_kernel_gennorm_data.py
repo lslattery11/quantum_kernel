@@ -42,7 +42,7 @@ if __name__ == '__main__':
         required = True,
         help = "beta value for generalized norm distribution")
     parser.add_argument(
-        "--seed", type = float,
+        "--seed", type = int,
         required = True,
         help = "beta value for generalized norm distribution"
     )
