@@ -40,7 +40,12 @@ if __name__ == '__main__':
     parser.add_argument(
         "--beta", type = float,
         required = True,
-        help = "beta value for genneralized norm distribution")
+        help = "beta value for generalized norm distribution")
+    parser.add_argument(
+        "--seed", type = float,
+        required = True,
+        help = "beta value for generalized norm distribution"
+    )
     parser.add_argument(
         "--projected",type=str,
         required = False,
@@ -58,7 +63,7 @@ if __name__ == '__main__':
     else:
         proj=args.projected
 
-    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}_beta_{args.beta}.p")
+    outpath = Path(args.outpath, f"Sparse_IQP_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_time_scale}_density_{args.density}_beta_{args.beta}_seed_{args.seed}.p")
 
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
@@ -70,7 +75,7 @@ if __name__ == '__main__':
     if args.dataset_dim > 30:
         raise ValueError(f"Dataset dimension {args.dataset_dim} too large; can support no more than 30 qubits")
 
-    seed=1302
+    seed=args.seed
     samples = get_gennorm_samples(args.beta,args.dataset_dim,1000,seed)
 
     mu=np.mean(samples,axis=0)
