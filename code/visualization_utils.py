@@ -6,6 +6,7 @@ import copy
 import sys
 import os
 import seaborn as sns
+import scipy
 import matplotlib.pyplot as plt
 
 
@@ -66,9 +67,10 @@ def aggregate_folder(folder,dataset_name,kernel_name,projected=False):
     return dfs
 
 #
-def aggregate_shapes(folder,prefix,return_dataframe=True):
+def aggregate_shapes(folder,prefix,return_dataframe=True,cols_to_drop=None):
     all_pickles_paths = list(Path(folder).glob(f"{prefix}*.p"))
     all_res = []
+    df_all = pd.DataFrame()
     for fname in all_pickles_paths:
         try:
             res = pickle.load(open(fname,'rb'))
@@ -77,9 +79,14 @@ def aggregate_shapes(folder,prefix,return_dataframe=True):
             print(fname)
             continue
         res.update(vars(res['args']))
-        all_res.append(res)
 
-    df_all = pd.DataFrame(all_res, columns=all_res[0].keys())
+        all_res.append(res)
+        if len(all_res) >= 500:
+            df_all=update_df(df_all,all_res,cols_to_drop)
+            all_res=[]
+
+    df_all=update_df(df_all,all_res,cols_to_drop)
+    
     if return_dataframe==True:
         return df_all
 
@@ -90,3 +97,17 @@ def filter_df(
     ):
     filtered_df=df.loc[(df[list(df_filter_dict)] == pd.Series(df_filter_dict)).all(axis=1)]
     return filtered_df
+
+def update_df(df,res_list,cols_to_drop,k=1):
+    if df.columns.size==0:
+        df=pd.DataFrame(res_list, columns=res_list[0].keys())
+        df['kernel_eigenvalues']=df.apply(lambda row: np.abs(scipy.linalg.eigh(-1*row.qkern_matrix_train,eigvals_only=True,subset_by_index=(0,k-1)))/row.qkern_matrix_train.shape[0], axis=1)
+
+    else:
+        temp_df=pd.DataFrame(res_list, columns=res_list[0].keys())
+        temp_df['kernel_eigenvalues']=temp_df.apply(lambda row: np.abs(scipy.linalg.eigh(-1*row.qkern_matrix_train,eigvals_only=True,subset_by_index=(0,k-1)))/row.qkern_matrix_train.shape[0], axis=1)
+
+        df=df.append(temp_df,ignore_index=True)
+    if cols_to_drop is not None:
+        df=df[df.columns[~df.columns.isin(cols_to_drop)]]
+    return df

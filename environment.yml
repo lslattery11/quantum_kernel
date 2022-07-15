@@ -16,6 +16,7 @@ dependencies:
   - tqdm==4.61.2
   - numexpr==2.7.1
   - ipykernel
+  - statsmodels
   - pip:
     - qiskit==0.36.1
     - qiskit-machine-learning==0.4.0
