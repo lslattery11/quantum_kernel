@@ -1,8 +1,11 @@
 import numpy as np
 import pandas as pd
-import scipy
+from sklearn.linear_model import LinearRegression
 from quantum_kernel.code.visualization_utils import filter_df
+import scipy
+from scipy.stats.distributions import  t
 
+#ugly maybe rewrite if time allows
 def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas):
     """
     Take data frame with max eigenvalue of kernel column,lambda column and dataset dim column.
@@ -10,19 +13,34 @@ def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas):
     the interpolation. return List[(N,lambda)] for gamma.
     """
     assert((gamma > 0) & (gamma <= 1.0)),'gamma must be between 0 and 1.'
-    points=[]
+    fitted_points=[]
     for lam in lambdas:
         lam_df=df[(df['scaling_factor']==lam)]
         #note xp and yp are different than lambda vs. N normally plotted because we want to interpolate to find the x intercept.
-        yp=lam_df.dataset_dim
-        xp=lam_df.apply(lambda x: max(x.kernel_eigenvalues),axis=1)
+        xp=lam_df.dataset_dim
+        xp=np.array(list(set(xp.values)))
         #sort for interpolation
-        xp,yp=zip(*sorted(zip(xp.values, yp.values), key=lambda x: x[0]))
+        points=[]
+        for x in xp:
+            ys=lam_df[(lam_df['dataset_dim']==x)].apply(lambda x: max(x.kernel_eigenvalues),axis=1).values
+            xs=np.array(len(ys)*[x])
+            new_points=list(zip(xs,ys))
+            points=points+new_points
+        points=np.array(points) 
+        #fit exponential decay to the points.
+        x=points[:,0]
+        y=points[:,1]
 
-        n=np.interp(gamma,xp,yp)
-        
-        points.append((n,lam))
-    return np.array(points)
+        popt,pcov=scipy.optimize.curve_fit(lambda t,a,b: a+b*t,  x,  np.log(y))
+        #solution np.log(y)=a+b*x -> y=exp(a)*exp(b*x)
+        #now solve for x, np.log(gamma) = a+b*x -> x = (np.log(gamma)-a)/b
+        ypred=(np.log(gamma)-popt[0])/popt[1]
+        #prediction interval t(1-a/2,number of data points - number of independent variables -1). 95% confidence interval.
+        fitted_points.append((ypred,lam))
+
+    return np.array(fitted_points)
+
+
 
 def compute_dataframe_kernel_eigenvalues(df: pd.DataFrame,filter: dict = {}, k: int = 1):
     """
