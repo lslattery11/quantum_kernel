@@ -10,4 +10,8 @@
 #SBATCH --time=00:30:00
 
 # Run My Program
+module load gcc
+module load anaconda
+conda activate quantum_kernel
+
 srun ~lslattery/quantum_kernel/scripts/./multi_compute_qk_Sparse_IQP.sh

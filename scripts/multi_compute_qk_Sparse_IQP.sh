@@ -10,9 +10,9 @@ beta=(0.1 1.0 2.0)
 seed=(10 1200 33 4 210)
 
 parallel \
-    --jobs 36 \
+    --jobs 15 \
     """
-        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath /home/lslattery/QK_project/results/Sparse_IQP/final_gennorm/quantum/ \
+        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath /home/lslattery/QK_project/results/Sparse_IQP/final_gennorm/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor 1.0 \
