@@ -31,10 +31,13 @@ def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas):
         x=points[:,0]
         y=points[:,1]
 
-        popt,pcov=scipy.optimize.curve_fit(lambda t,a,b: a+b*t,  x,  np.log(y))
+        #popt,pcov=scipy.optimize.curve_fit(lambda t,a,b: a+b*t,  x,  np.log(y))
+        popt,pcov=scipy.optimize.curve_fit(lambda t,a,b,c: np.log(a*np.exp(-b*t)+c),  x,  np.log(y),bounds=(0, [1.0, 2.0, 0.2]))
+
         #solution np.log(y)=a+b*x -> y=exp(a)*exp(b*x)
         #now solve for x, np.log(gamma) = a+b*x -> x = (np.log(gamma)-a)/b
-        ypred=(np.log(gamma)-popt[0])/popt[1]
+        #ypred=(np.log(gamma)-popt[0])/popt[1]
+        ypred=-np.log((gamma-popt[2])/popt[0])/popt[1]
         #prediction interval t(1-a/2,number of data points - number of independent variables -1). 95% confidence interval.
         fitted_points.append((ypred,lam))
 
