@@ -13,7 +13,7 @@ seed=(10 1200 33 4 210)
 parallel \
     --jobs 15 \
     """
-        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/Sparse_IQP/final_gennorm/beta1.0gamma0.2/ \
+        python compute_Sparse_IQP_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/Sparse_IQP/final_gennorm/beta1.0gamma0.5/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor 1.0 \
