@@ -20,7 +20,7 @@ parallel \
         --scaling-factor {1} \
         --int-scaling-factor 1.0 \
         --density {2} \
-        --beta 1.0 \
+        --beta 2.0 \
         --seed {3} \
         --projected ''
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}"
