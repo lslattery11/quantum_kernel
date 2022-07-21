@@ -2,22 +2,22 @@
 export PYTHONPATH=${PYTHONPATH}:/mnt/c/Users/lslat/Code/
 export PYTHONPATH=${PYTHONPATH}:/mnt/c/Users/lslat/QiskitProjects/VariationalWavefunction/
 export PYTHONPATH=${PYTHONPATH}:/media/HomeData/lslattery/
+export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
-data_dim=(4 6 8 10)
-lam1=(0 0.01 0.025 0.05 0.1 0.25 1.0)
-lam2=(0 0.01 0.025 0.05 0.1 0.25 1.0)
+mapfile -t sf < logspace-2.0.20.txt
+ndisf=(0.001 0.01 0.1)
+dim=(5 6 7 8 9 10 11 12 13 14 15 16 17 18 19)
+seed=(10 1200 33 4 210)
 
 parallel \
-    --jobs 17 \
+    --jobs 15 \
     """
-        python compute_quantum_kernel_HZZMulti.py --outpath /media/HomeData/lslattery/QK_project/results/hproj_HZZMulti/fashion-mnist/ \
-        --dataset-dim {1} \
-        --n-trotter 10 \
-        --evo-time 1 \
-        --init-state 'Haar_random' \
-        --init-state-seed 0 \
-        --lam1 {2} \
-        --lam2 {3} \
-        --dataset fashion-mnist \
-        --projected huang_proj
-    """ ::: "${data_dim[@]}" ::: "${lam1[@]}" ::: "${lam2[@]}"
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/beta1.0/ \
+        --dataset-dim {3} \
+        --scaling-factor {1} \
+        --int-scaling-factor 0.0 \
+        --non-data-int-scaling-factor {2} \
+        --beta 1.0 \
+        --seed {4} \
+        --projected ''
+    """ ::: "${sf[@]}" ::: "${ndisf[@]}" ::: "${dim[@]}" ::: "${seed[@]}"

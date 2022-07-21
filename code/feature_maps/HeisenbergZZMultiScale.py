@@ -13,7 +13,6 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         self,
         feature_dim: int,
         n_trotter: int,
-        evo_time: float,
         init_state: str,
         init_state_seed: int,
         lam0 : float = 1.0,
@@ -28,11 +27,11 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         self._init_state=init_state
         self._init_state_seed=init_state_seed
 
-        self.scaling_factor= 2 * evo_time/n_trotter
+        #self.scaling_factor= 2 * evo_time/n_trotter
         self.lam0=lam0
         self.lam1=lam1
         self.lam2=lam2
-        self.evo_time=evo_time
+        #self.evo_time=evo_time
         self.n_trotter=n_trotter
 
         self.add_register(QuantumRegister(self._num_qubits,'q'))
@@ -59,8 +58,20 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         qc=QuantumCircuit(qr)
 
         qc=self.construct_init_state(qc,qr)
-        np.random.seed()
         for _ in range(self.n_trotter):
+            #Z data layer
+            for q1 in range(self._feature_dimension):
+                phase=self.lam0*(2*params[q1])
+                qc.u1(phase,qr[q1])
+            #ZZ data layer
+            for q1 in range(self._feature_dimension):
+                for q2 in range(q1 + 1, self._feature_dimension):
+                    phase=self.lam1*(np.pi-params[q1])*(np.pi-params[q2])
+                    qc.h(qr[q1])
+                    qc.h(qr[q2])
+                    qc.cx(qr[q1],qr[q2])
+                    qc.p(phase,qr[q2])
+                    qc.cx(qr[q1],qr[q2])
             #J1-J2 non-data layer
             for q1 in range(self._feature_dimension):
                 q2=q1+1
@@ -70,28 +81,20 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
                 # XX
                 qc.h([qr[q1],qr[q2]])
                 qc.cx(qr[q1],qr[q2])
-                qc.rz(self.lam1, qr[q2])
+                qc.rz(self.lam2, qr[q2])
                 qc.cx(qr[q1],qr[q2])
                 qc.h([qr[q1],qr[q2]])
                 # YY
                 qc.rx(np.pi/2, [qr[q1],qr[q2]])
                 qc.cx(qr[q1],qr[q2])
-                qc.rz(self.lam1, qr[q2])
+                qc.rz(self.lam2, qr[q2])
                 qc.cx(qr[q1],qr[q2])
                 qc.rx(np.pi/2, [qr[q1],qr[q2]])
                 # ZZ
                 qc.cx(qr[q1],qr[q2])
-                qc.rz(self.lam1, qr[q2])
+                qc.rz(self.lam2, qr[q2])
                 qc.cx(qr[q1],qr[q2])
-            #ZZ data layer
-            for q1 in range(self._feature_dimension):
-                for q2 in range(q1 + 1, self._feature_dimension):
-                    phase=self.lam2*(np.pi-params[q1])*(np.pi-params[q2])
-                    qc.h(qr[q1])
-                    qc.h(qr[q2])
-                    qc.cx(qr[q1],qr[q2])
-                    qc.p(phase,qr[q2])
-                    qc.cx(qr[q1],qr[q2])
+            
         return qc
 
 
@@ -116,6 +119,8 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
             for i,qreg in enumerate(qr):
                 if np.random.randint(0, 2):
                     qc.rx(random_params[i], qreg)
+        elif init_state=='zero':
+            pass
         else:
             raise ValueError(f"Unknown initial state init_state={init_state}")
         return qc
