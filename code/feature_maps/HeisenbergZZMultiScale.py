@@ -18,7 +18,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         lam0 : float = 1.0,
         lam1 : float = 1.0,
         lam2 : float = 1.0,
-        h_layer: bool = True,
+        h_layer: int = 1,
         name: str = 'HZZMulti'
     ) -> None:
         super().__init__(name=name)
@@ -75,7 +75,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
                     qc.p(phase,qr[q2])
                     qc.cx(qr[q1],qr[q2])
             #h layer
-            if self.h_layer==True:
+            if self.h_layer==1:
                 for q1 in range(self._feature_dimension):
                     qc.h(qr[q1])
             #J1-J2 non-data layer
