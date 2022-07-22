@@ -18,6 +18,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         lam0 : float = 1.0,
         lam1 : float = 1.0,
         lam2 : float = 1.0,
+        h_layer: bool = True,
         name: str = 'HZZMulti'
     ) -> None:
         super().__init__(name=name)
@@ -31,6 +32,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         self.lam0=lam0
         self.lam1=lam1
         self.lam2=lam2
+        self.h_layer=h_layer
         #self.evo_time=evo_time
         self.n_trotter=n_trotter
 
@@ -72,6 +74,10 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
                     qc.cx(qr[q1],qr[q2])
                     qc.p(phase,qr[q2])
                     qc.cx(qr[q1],qr[q2])
+            #h layer
+            if self.h_layer==True:
+                for q1 in range(self._feature_dimension):
+                    qc.h(qr[q1])
             #J1-J2 non-data layer
             for q1 in range(self._feature_dimension):
                 q2=q1+1
