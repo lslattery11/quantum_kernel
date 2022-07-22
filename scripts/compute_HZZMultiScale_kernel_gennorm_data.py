@@ -42,6 +42,10 @@ if __name__ == '__main__':
         required=True,
         help = "include hadmard layer or not")
     parser.add_argument(
+        "--alpha", type = float,
+        required = True,
+        help = "alpha exponent value for IQP")
+    parser.add_argument(
         "--beta", type = float,
         required = True,
         help = "beta value for generalized norm distribution")
@@ -62,6 +66,10 @@ if __name__ == '__main__':
     scaling_factor=args.scaling_factor
     int_scaling_factor=args.int_scaling_factor
     non_data_int_scaling_factor=args.non_data_int_scaling_factor
+
+    #rescale by alpha factor
+    non_data_int_scaling_factor=non_data_int_scaling_factor**(args.alpha/2)
+    
     h_layer=args.h_layer
     if args.projected != '':
         proj='_'+args.projected
