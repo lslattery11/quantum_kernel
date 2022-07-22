@@ -79,27 +79,28 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
                 for q1 in range(self._feature_dimension):
                     qc.h(qr[q1])
             #J1-J2 non-data layer
-            for q1 in range(self._feature_dimension):
-                q2=q1+1
-                if q2 >= self._num_qubits:
-                    continue
-                #decay of long range interactions
-                # XX
-                qc.h([qr[q1],qr[q2]])
-                qc.cx(qr[q1],qr[q2])
-                qc.rz(self.lam2, qr[q2])
-                qc.cx(qr[q1],qr[q2])
-                qc.h([qr[q1],qr[q2]])
-                # YY
-                qc.rx(np.pi/2, [qr[q1],qr[q2]])
-                qc.cx(qr[q1],qr[q2])
-                qc.rz(self.lam2, qr[q2])
-                qc.cx(qr[q1],qr[q2])
-                qc.rx(np.pi/2, [qr[q1],qr[q2]])
-                # ZZ
-                qc.cx(qr[q1],qr[q2])
-                qc.rz(self.lam2, qr[q2])
-                qc.cx(qr[q1],qr[q2])
+            if self.lam2 != 0:
+                for q1 in range(self._feature_dimension):
+                    q2=q1+1
+                    if q2 >= self._num_qubits:
+                        continue
+                    #decay of long range interactions
+                    # XX
+                    qc.h([qr[q1],qr[q2]])
+                    qc.cx(qr[q1],qr[q2])
+                    qc.rz(self.lam2, qr[q2])
+                    qc.cx(qr[q1],qr[q2])
+                    qc.h([qr[q1],qr[q2]])
+                    # YY
+                    qc.rx(np.pi/2, [qr[q1],qr[q2]])
+                    qc.cx(qr[q1],qr[q2])
+                    qc.rz(self.lam2, qr[q2])
+                    qc.cx(qr[q1],qr[q2])
+                    qc.rx(np.pi/2, [qr[q1],qr[q2]])
+                    # ZZ
+                    qc.cx(qr[q1],qr[q2])
+                    qc.rz(self.lam2, qr[q2])
+                    qc.cx(qr[q1],qr[q2])
             
         return qc
 
