@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--h-layer", type=int,
         required=True,
-        choices=[0,1]
+        choices=[0,1],
         help = "include hadmard layer or not")
     parser.add_argument(
         "--alpha", type = float,
