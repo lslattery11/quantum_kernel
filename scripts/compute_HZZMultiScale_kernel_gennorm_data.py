@@ -38,6 +38,10 @@ if __name__ == '__main__':
         required=True,
         help = "scale all two qubit non-data interactions by this factor")
     parser.add_argument(
+        "--h-layer", type=bool,
+        required=True,
+        help = "include hadmard layer or not")
+    parser.add_argument(
         "--beta", type = float,
         required = True,
         help = "beta value for generalized norm distribution")
@@ -58,12 +62,13 @@ if __name__ == '__main__':
     scaling_factor=args.scaling_factor
     int_scaling_factor=args.int_scaling_factor
     non_data_int_scaling_factor=args.non_data_int_scaling_factor
+    h_layer=args.h_layer
     if args.projected != '':
         proj='_'+args.projected
     else:
         proj=args.projected
 
-    outpath = Path(args.outpath, f"HZZ_Multi_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_scaling_factor}_{non_data_int_scaling_factor}_beta_{args.beta}_seed_{args.seed}.p")
+    outpath = Path(args.outpath, f"HZZ_Multi_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_scaling_factor}_{non_data_int_scaling_factor}_hlayer_{h_layer}_beta_{args.beta}_seed_{args.seed}.p")
 
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
@@ -76,19 +81,19 @@ if __name__ == '__main__':
         raise ValueError(f"Dataset dimension {args.dataset_dim} too large; can support no more than 30 qubits")
 
     seed=args.seed
-    samples = get_gennorm_samples(args.beta,args.dataset_dim,1000,seed)
+    samples = get_gennorm_samples(args.beta,args.dataset_dim,500,seed)
 
     mu=np.mean(samples,axis=0)
     sigma=np.sqrt(np.var(samples,axis=0))
     #normalize and standardize
     samples=(samples-mu)/sigma
     #rescale using IQP parameter
-    samples *= scaling_factor
+    #samples *= scaling_factor
 
-    n_trotter=5
+    n_trotter=2
     init_state='zero'
     init_state_seed = 0
-    FeatureMap = HeisenbergZZMultiScale.HZZMultiscaleFeatureMap(args.dataset_dim,n_trotter,init_state,init_state_seed,scaling_factor,int_scaling_factor,non_data_int_scaling_factor)
+    FeatureMap = HeisenbergZZMultiScale.HZZMultiscaleFeatureMap(args.dataset_dim,n_trotter,init_state,init_state_seed,scaling_factor,int_scaling_factor,non_data_int_scaling_factor,h_layer)
 
     if args.projected=='':
         qkern = get_quantum_kernel(FeatureMap,device='CPU',batch_size=50)
