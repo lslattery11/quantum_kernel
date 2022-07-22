@@ -38,8 +38,9 @@ if __name__ == '__main__':
         required=True,
         help = "scale all two qubit non-data interactions by this factor")
     parser.add_argument(
-        "--h-layer", type=bool,
+        "--h-layer", type=int,
         required=True,
+        choices=[0,1]
         help = "include hadmard layer or not")
     parser.add_argument(
         "--alpha", type = float,
@@ -69,14 +70,14 @@ if __name__ == '__main__':
 
     #rescale by alpha factor
     non_data_int_scaling_factor=non_data_int_scaling_factor**(args.alpha/2)
-    
+
     h_layer=args.h_layer
     if args.projected != '':
         proj='_'+args.projected
     else:
         proj=args.projected
 
-    outpath = Path(args.outpath, f"HZZ_Multi_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_scaling_factor}_{non_data_int_scaling_factor}_hlayer_{h_layer}_beta_{args.beta}_seed_{args.seed}.p")
+    outpath = Path(args.outpath, f"HZZ_Multi_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_scaling_factor}_{non_data_int_scaling_factor}_hlayer_{h_layer}_alpha_{args.alpha}_beta_{args.beta}_seed_{args.seed}.p")
 
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
