@@ -22,7 +22,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         name: str = 'HZZMulti'
     ) -> None:
         super().__init__(name=name)
-        self._num_qubits = feature_dim+1
+        self._num_qubits = feature_dim
         self._feature_dimension = feature_dim
         self._support_parameterized_circuit = True
         self._init_state=init_state
@@ -68,7 +68,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
             #Z data layer
             for q1 in range(self._feature_dimension):
                 phase=self.lam0*(2*params[q1])
-                qc.u1(phase,qr[q1])
+                qc.p(phase,qr[q1])
             #ZZ data layer (maybe the ordering is wrong?)
             for q1 in range(self._feature_dimension):
                 for q2 in range(q1 + 1, self._feature_dimension):
@@ -76,7 +76,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
                     #qc.h(qr[q1])
                     #qc.h(qr[q2])
                     qc.cx(qr[q1],qr[q2])
-                    qc.u1(phase,qr[q2])
+                    qc.p(phase,qr[q2])
                     qc.cx(qr[q1],qr[q2])
 
             #J1 non-data layer
