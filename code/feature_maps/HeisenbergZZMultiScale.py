@@ -76,10 +76,10 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
                     #qc.h(qr[q1])
                     #qc.h(qr[q2])
                     qc.cx(qr[q1],qr[q2])
-                    qc.p(phase,qr[q2])
+                    qc.u1(phase,qr[q2])
                     qc.cx(qr[q1],qr[q2])
 
-            #J1-J2 non-data layer
+            #J1 non-data layer
             if self.lam2 != 0:
                 for q1 in range(self._feature_dimension):
                     q2=q1+1
