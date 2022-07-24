@@ -90,7 +90,7 @@ if __name__ == '__main__':
         raise ValueError(f"Dataset dimension {args.dataset_dim} too large; can support no more than 30 qubits")
 
     seed=args.seed
-    samples = get_gennorm_samples(args.beta,args.dataset_dim,500,seed)
+    samples = get_gennorm_samples(args.beta,args.dataset_dim,1000,seed)
 
     mu=np.mean(samples,axis=0)
     sigma=np.sqrt(np.var(samples,axis=0))

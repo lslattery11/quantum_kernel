@@ -69,7 +69,7 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
             for q1 in range(self._feature_dimension):
                 phase=self.lam0*(2*params[q1])
                 qc.u1(phase,qr[q1])
-            #ZZ data layer
+            #ZZ data layer (maybe the ordering is wrong?)
             for q1 in range(self._feature_dimension):
                 for q2 in range(q1 + 1, self._feature_dimension):
                     phase=2*(np.pi-self.lam1*params[q1])*(np.pi-self.lam1*params[q2])
