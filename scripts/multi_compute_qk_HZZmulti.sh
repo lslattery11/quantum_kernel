@@ -24,6 +24,7 @@ parallel \
         --beta {5} \
         --seed {4} \
         --projected ''
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${alpha[@]}" ::: "${seed[@]}" ::: "${beta[@]}"
 
 
 
