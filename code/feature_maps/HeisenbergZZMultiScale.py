@@ -61,6 +61,10 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
 
         qc=self.construct_init_state(qc,qr)
         for _ in range(self.n_trotter):
+            #h layer
+            if self.h_layer==1:
+                for q1 in range(self._feature_dimension):
+                    qc.h(qr[q1])
             #Z data layer
             for q1 in range(self._feature_dimension):
                 phase=self.lam0*(2*params[q1])
@@ -69,15 +73,12 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
             for q1 in range(self._feature_dimension):
                 for q2 in range(q1 + 1, self._feature_dimension):
                     phase=(np.pi-self.lam1*params[q1])*(np.pi-self.lam1*params[q2])
-                    qc.h(qr[q1])
-                    qc.h(qr[q2])
+                    #qc.h(qr[q1])
+                    #qc.h(qr[q2])
                     qc.cx(qr[q1],qr[q2])
                     qc.p(phase,qr[q2])
                     qc.cx(qr[q1],qr[q2])
-            #h layer
-            if self.h_layer==1:
-                for q1 in range(self._feature_dimension):
-                    qc.h(qr[q1])
+
             #J1-J2 non-data layer
             if self.lam2 != 0:
                 for q1 in range(self._feature_dimension):
