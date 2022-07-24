@@ -4,7 +4,7 @@ export PYTHONPATH=${PYTHONPATH}:/mnt/c/Users/lslat/QiskitProjects/VariationalWav
 export PYTHONPATH=${PYTHONPATH}:/media/HomeData/lslattery/
 export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
-sf=(0.1 1.0 2.0)
+sf=(0.01 0.1 1.0 2.0)
 dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19)
 alpha=(2.0)
 seed=(10 1200 33 4 210)
