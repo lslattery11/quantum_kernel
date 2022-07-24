@@ -81,7 +81,6 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
 
             #J1 non-data layer
             if self.lam2 != 0:
-                print('here')
                 for q1 in range(self._feature_dimension):
                     q2=q1+1
                     if q2 >= self._num_qubits:
