@@ -60,9 +60,9 @@ class HZZMultiscaleFeatureMap(BlueprintCircuit):
         qc=QuantumCircuit(qr)
 
         qc=self.construct_init_state(qc,qr)
-        for _ in range(self.n_trotter):
+        for layer in range(self.n_trotter):
             #h layer
-            if self.h_layer==1:
+            if self.h_layer==1 or layer==0:
                 for q1 in range(self._feature_dimension):
                     qc.h(qr[q1])
             #Z data layer
