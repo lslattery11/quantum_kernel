@@ -33,7 +33,7 @@ def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas):
 
         #popt,pcov=scipy.optimize.curve_fit(lambda t,a,b: a+b*t,  x,  np.log(y))
         #popt,pcov=scipy.optimize.curve_fit(lambda t,a,b,c: np.log(a*np.exp(-b*t)+c),  x,  np.log(y),bounds=(0, [1.0, 5, 0.2]))
-        popt,pcov=scipy.optimize.curve_fit(lambda t,a,b,c,d: np.log(a*np.exp(-b*t)+c+d*x),  x,  np.log(y),bounds=([0,0,0,-2], [1.0, 2.0, 0.5,2]))
+        popt,pcov=scipy.optimize.curve_fit(lambda t,a,b,c,d: np.log(a*np.exp(-b*t)+c+d*x),  x,  np.log(y),bounds=([0,0,0,-1], [1.0, 2.0, 0.5,1]),p0=[1,0,0,0])
 
         #solution np.log(y)=a+b*x -> y=exp(a)*exp(b*x)
         #now solve for x, np.log(gamma) = a+b*x -> x = (np.log(gamma)-a)/b

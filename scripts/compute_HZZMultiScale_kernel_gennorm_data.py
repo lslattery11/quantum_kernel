@@ -56,6 +56,11 @@ if __name__ == '__main__':
         help = "seed value for generalized norm distribution"
     )
     parser.add_argument(
+        "--n_trotter", type = int,
+        required = True,
+        help = "number of trotter steps"
+    )
+    parser.add_argument(
         "--projected",type=str,
         required = False,
         choices=['huang_proj',''],
@@ -99,7 +104,7 @@ if __name__ == '__main__':
     #rescale using IQP parameter
     #samples *= scaling_factor
 
-    n_trotter=2
+    n_trotter=args.n_trotter
     init_state='zero'
     init_state_seed = 0
     FeatureMap = HeisenbergZZMultiScale.HZZMultiscaleFeatureMap(args.dataset_dim,n_trotter,init_state,init_state_seed,scaling_factor,int_scaling_factor,non_data_int_scaling_factor,h_layer)
