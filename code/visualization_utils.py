@@ -84,8 +84,9 @@ def aggregate_shapes(folder,prefix,return_dataframe=True,cols_to_drop=None):
         if len(all_res) >= 500:
             df_all=update_df(df_all,all_res,cols_to_drop)
             all_res=[]
-
-    df_all=update_df(df_all,all_res,cols_to_drop)
+            
+    if len(all_res) > 0:
+        df_all=update_df(df_all,all_res,cols_to_drop)
     
     if return_dataframe==True:
         return df_all
