@@ -4,9 +4,10 @@ from sklearn.linear_model import LinearRegression
 from quantum_kernel.code.visualization_utils import filter_df
 import scipy
 from scipy.stats.distributions import  t
+from scipy.interpolate import interp1d
 
 #ugly maybe rewrite if time allows
-def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas):
+def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas,key='scaling_factor'):
     """
     Take data frame with max eigenvalue of kernel column,lambda column and dataset dim column.
     Create interpolation between max eigenvalue vs. N for each value of lambda. Find N returning gamma using 
@@ -15,32 +16,23 @@ def get_eigenvalue_scaling(df: pd.DataFrame,gamma,lambdas):
     assert((gamma > 0) & (gamma <= 1.0)),'gamma must be between 0 and 1.'
     fitted_points=[]
     for lam in lambdas:
-        lam_df=df[(df['scaling_factor']==lam)]
-        #note xp and yp are different than lambda vs. N normally plotted because we want to interpolate to find the x intercept.
-        xp=lam_df.dataset_dim
-        xp=np.array(list(set(xp.values)))
-        #sort for interpolation
-        points=[]
-        for x in xp:
-            ys=lam_df[(lam_df['dataset_dim']==x)].apply(lambda x: max(x.kernel_eigenvalues),axis=1).values
-            xs=np.array(len(ys)*[x])
-            new_points=list(zip(xs,ys))
-            points=points+new_points
-        points=np.array(points) 
-        #fit exponential decay to the points.
-        x=points[:,0]
-        y=points[:,1]
+        lam_df=df[(df[key]==lam)]
 
-        #popt,pcov=scipy.optimize.curve_fit(lambda t,a,b: a+b*t,  x,  np.log(y))
-        #popt,pcov=scipy.optimize.curve_fit(lambda t,a,b,c: np.log(a*np.exp(-b*t)+c),  x,  np.log(y),bounds=(0, [1.0, 5, 0.2]))
-        popt,pcov=scipy.optimize.curve_fit(lambda t,a,b,c,d: np.log(a*np.exp(-b*t)+c+d*x),  x,  np.log(y),bounds=([0,0,0,-1], [1.0, 2.0, 0.5,1]),p0=[1,0,0,0])
+        x=lam_df.dataset_dim
+        y=lam_df.apply(lambda x: max(x.kernel_eigenvalues),axis=1)
+        points=np.array(list(zip(x.values,y.values)))
+    
+        new_x=list(set(points[:,0]))
+        new_y=[np.mean([point[1] for point in points if point[0]==x]) for x in new_x]
 
-        #solution np.log(y)=a+b*x -> y=exp(a)*exp(b*x)
-        #now solve for x, np.log(gamma) = a+b*x -> x = (np.log(gamma)-a)/b
-        #ypred=(np.log(gamma)-popt[0])/popt[1]
-        ypred=-np.log((gamma-popt[2])/popt[0])/popt[1]
-        #prediction interval t(1-a/2,number of data points - number of independent variables -1). 95% confidence interval.
-        fitted_points.append((ypred,lam))
+        func=interp1d(new_x,new_y,kind='linear',bounds_error=False)
+
+        try:
+            func2 = lambda x: func(x)-gamma
+            ypred=scipy.optimize.root_scalar(func2,x0=(max(new_x)+min(new_x))/2,bracket=[min(new_x),max(new_x)],method='brentq',xtol=0.1,maxiter=10**4).root
+            fitted_points.append((ypred,lam))
+        except:
+            continue
 
     return np.array(fitted_points)
 
