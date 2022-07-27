@@ -7,7 +7,7 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
 #dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20 21)
+dim=(2 3 19 20)
 seed=(10 1200 33 4 210)
 beta=(1.0)
 ndisf=(0.0 0.01 0.1 1.0)
@@ -32,7 +32,7 @@ parallel \
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
 #dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20 21)
+dim=(2 3 19 20)
 alpha=(2.0)
 seed=(10 1200 33 4 210)
 beta=(0.1 2.0)
@@ -82,7 +82,7 @@ parallel \
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
 #dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20 21)
+dim=(2 3 19 20)
 alpha=(0.5 1.0 2.0)
 seed=(10 1200 33 4 210)
 beta=(1.0)
@@ -107,7 +107,7 @@ parallel \
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
 #dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20 21)
+dim=(2 3 19 20)
 alpha=(0.5 1.0 2.0)
 seed=(10 1200 33 4 210)
 beta=(1.0)
@@ -132,7 +132,7 @@ parallel \
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
 #dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20 21)
+dim=(2 3 19 20)
 alpha=(2.0)
 seed=(10 1200 33 4 210)
 beta=(1.0)
@@ -157,7 +157,7 @@ parallel \
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
 #dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20 21)
+dim=(2 3 19 20)
 alpha=(2.0)
 seed=(10 1200 33 4 210)
 beta=(1.0)

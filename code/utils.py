@@ -145,7 +145,7 @@ def get_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, bat
     if MPI==False:
         quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device))
     else:
-        quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=23))
+        quantum_instance_sv = QuantumInstance(AerSimulator(method=simulation_method, shots=shots,device=device,blocking_enable=True, blocking_qubits=20))
     return QuantumKernel(feature_map=FeatureMap, quantum_instance=quantum_instance_sv, batch_size=batch_size)
 
 def get_projected_quantum_kernel(FeatureMap, simulation_method='statevector', shots=1, batch_size=500,gamma=1,device='CPU',MPI=False):
