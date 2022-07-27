@@ -61,6 +61,11 @@ if __name__ == '__main__':
         help = "number of trotter steps"
     )
     parser.add_argument(
+        "--matrix_size", type = int,
+        required = True,
+        help = "size of kernel matrix"
+    )
+    parser.add_argument(
         "--projected",type=str,
         required = False,
         choices=['huang_proj',''],
@@ -82,7 +87,7 @@ if __name__ == '__main__':
     else:
         proj=args.projected
 
-    outpath = Path(args.outpath, f"HZZ_Multi_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_scaling_factor}_{non_data_int_scaling_factor}_hlayer_{h_layer}_alpha_{args.alpha}_beta_{args.beta}_seed_{args.seed}.p")
+    outpath = Path(args.outpath, f"HZZ_Multi_dim_{args.dataset_dim}{proj}_scales_{scaling_factor}_{int_scaling_factor}_{non_data_int_scaling_factor}_hlayer_{h_layer}_alpha_{args.alpha}_beta_{args.beta}_seed_{args.seed}_matrix_size_{args.matrix_size}.p")
 
     if outpath.exists():
         print(f"Found already computed at {outpath}, exiting")
@@ -95,7 +100,7 @@ if __name__ == '__main__':
         raise ValueError(f"Dataset dimension {args.dataset_dim} too large; can support no more than 30 qubits")
 
     seed=args.seed
-    samples = get_gennorm_samples(args.beta,args.dataset_dim,500,seed)
+    samples = get_gennorm_samples(args.beta,args.dataset_dim,args.matrix_size,seed)
 
     mu=np.mean(samples,axis=0)
     sigma=np.sqrt(np.var(samples,axis=0))
