@@ -5,12 +5,12 @@ export PYTHONPATH=${PYTHONPATH}:/media/HomeData/lslattery/
 export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
 
-sf=(1.406)
-dim=(16)
+sf=(2.0739)
+dim=(12)
 seed=(10 1200 33 4 210)
 beta=(0.1)
 alpha=(2.0)
-size=(50 100 200 500 1000 2000 5000)
+size=(50 100 200 500 1000 2000)
 parallel \
     --jobs 30 \
     """
@@ -29,12 +29,12 @@ parallel \
 
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
-sf=(0.2099)
-dim=(16)
+sf=(0.2607)
+dim=(12)
 seed=(10 1200 33 4 210)
 beta=(1.0)
 alpha=(2.0)
-size=(50 100 200 500 1000 2000 5000)
+size=(50 100 200 500 1000 2000)
 parallel \
     --jobs 30 \
     """
@@ -53,12 +53,12 @@ parallel \
 
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
-sf=(0.2104)
-dim=(16)
+sf=(0.2531)
+dim=(12)
 seed=(10 1200 33 4 210)
 beta=(2.0)
 alpha=(2.0)
-size=(50 100 200 500 1000 2000 5000)
+size=(50 100 200 500 1000 2000)
 parallel \
     --jobs 30 \
     """
@@ -78,11 +78,11 @@ parallel \
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 mapfile -t sf < logspace-2.1.30.txt
-dim=(16)
+dim=(12)
 seed=(10 1200 33 4 210)
 beta=(0.1)
 alpha=(2.0)
-size=(50 100 200 500 1000 2000 5000)
+size=(50 100 200 500 1000 2000)
 parallel \
     --jobs 30 \
     """
@@ -102,11 +102,11 @@ parallel \
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 mapfile -t sf < logspace-2.1.30.txt
-dim=(16)
+dim=(12)
 seed=(10 1200 33 4 210)
 beta=(1.0)
 alpha=(2.0)
-size=(50 100 200 500 1000 2000 5000)
+size=(50 100 200 500 1000 2000)
 parallel \
     --jobs 30 \
     """
@@ -126,11 +126,11 @@ parallel \
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 mapfile -t sf < logspace-2.1.30.txt
-dim=(16)
+dim=(12)
 seed=(10 1200 33 4 210)
 beta=(2.0)
 alpha=(2.0)
-size=(50 100 200 500 1000 2000 5000)
+size=(50 100 200 500 1000 2000)
 parallel \
     --jobs 30 \
     """
