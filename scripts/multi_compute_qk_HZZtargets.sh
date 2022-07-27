@@ -27,7 +27,7 @@ parallel \
         --matrix_size {6} \
         --projected ''
 
-    """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 sf=(0.2607)
 dim=(12)
@@ -51,7 +51,7 @@ parallel \
         --matrix_size {6} \
         --projected ''
 
-    """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 sf=(0.2531)
 dim=(12)
@@ -75,7 +75,7 @@ parallel \
         --matrix_size {6} \
         --projected ''
 
-    """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 mapfile -t sf < logspace-2.1.30.txt
 dim=(12)
@@ -99,7 +99,7 @@ parallel \
         --matrix_size {6} \
         --projected ''
 
-    """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 mapfile -t sf < logspace-2.1.30.txt
 dim=(12)
@@ -123,7 +123,7 @@ parallel \
         --matrix_size {6} \
         --projected ''
 
-    """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
 
 mapfile -t sf < logspace-2.1.30.txt
 dim=(12)
@@ -147,4 +147,4 @@ parallel \
         --matrix_size {6} \
         --projected ''
 
-    """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${size[@]}"
