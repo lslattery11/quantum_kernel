@@ -26,6 +26,7 @@ parallel \
         --beta {4} \
         --seed {3} \
         --n_trotter 4 \
+        --matrix_size 500 \
         --projected ''
 
     """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${ndisf[@]}"
