@@ -66,6 +66,10 @@ if __name__ == '__main__':
         help = "size of kernel matrix"
     )
     parser.add_argument(
+        "--r",type=float,
+        required = True,
+        help = "correlation coefficent for data points")
+    parser.add_argument(
         "--projected",type=str,
         required = False,
         choices=['huang_proj',''],
@@ -100,7 +104,8 @@ if __name__ == '__main__':
         raise ValueError(f"Dataset dimension {args.dataset_dim} too large; can support no more than 30 qubits")
 
     seed=args.seed
-    samples = get_gennorm_samples(args.beta,args.dataset_dim,args.matrix_size,seed)
+    r=args.r
+    samples = get_gennorm_samples(args.beta,args.dataset_dim,args.matrix_size,seed,r)
 
     mu=np.mean(samples,axis=0)
     sigma=np.sqrt(np.var(samples,axis=0))
