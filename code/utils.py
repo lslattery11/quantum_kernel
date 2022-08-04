@@ -133,9 +133,9 @@ def get_gennorm_samples(beta,dim,num_samples,seed=0,r=0):
             sample=stats.gennorm(beta).rvs(dim)
         else:
             sample=np.zeros(dim)
-            prev_sample=0
+            prev_sample=stats.gennorm(beta).rvs(1)
             for j in range(dim):
-                sample[j]=prev_sample*r+np.sqrt(1-r**2)*stats.gennorm(beta).rvs(1)
+                sample[j]=r*prev_sample+np.sqrt(1-r**2)*stats.gennorm(beta).rvs(1)
                 prev_sample=sample[j]
         samples[i]=sample
     return samples

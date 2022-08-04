@@ -6,10 +6,10 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
-dim=(2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
+dim=(2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19)
 seed=(10 1200 33 4 210)
 beta=(2.0)
-r=(0.0 0.25 0.5 0.75 1.0)
+r=(0.0 0.33 0.66 1.0)
 
 parallel \
     --jobs 30 \
