@@ -125,11 +125,18 @@ def get_dataset(name, dataset_dim, n_train, n_test):
     else:
         raise ValueError(f"Unknown dataset: {name}")
 
-def get_gennorm_samples(beta,dim,num_samples,seed=0):
+def get_gennorm_samples(beta,dim,num_samples,seed=0,r=0):
     np.random.seed(seed)
     samples=np.zeros((num_samples,dim))
     for i in range(num_samples):
-        sample=stats.gennorm(beta).rvs(dim)
+        if r==0:
+            sample=stats.gennorm(beta).rvs(dim)
+        else:
+            sample=np.zeros(dim)
+            prev_sample=0
+            for j in range(dim):
+                sample[j]=prev_sample*r+np.sqrt(1-r**2)*stats.gennorm(beta).rvs(1)
+                prev_sample=sample[j]
         samples[i]=sample
     return samples
 

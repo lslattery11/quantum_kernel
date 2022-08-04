@@ -6,27 +6,45 @@ export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
 
 mapfile -t sf < logspace-1.5.0.5.20.txt
-#dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
-dim=(2 3 19 20)
+dim=(2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
 seed=(10 1200 33 4 210)
-beta=(1.0)
-ndisf=(0.0 0.01 0.1 1.0)
-
+beta=(2.0)
+r=(0.0, 0.25 0.5 0.75 1.0)
 
 parallel \
     --jobs 30 \
     """
-        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/non_data_layer_test/beta{4}/ \
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/r{5}/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
-        --int-scaling-factor 0 \
-        --non-data-int-scaling-factor {5} \
+        --int-scaling-factor {1} \
+        --non-data-int-scaling-factor 0 \
+        --h-layer 1 \
+        --alpha 2.0 \
+        --beta {4} \
+        --seed {3} \
+        --n_trotter 4 \
+        --matrix_size 500 \
+        --r {5} \
+        --projected ''
+
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${r[@]}"
+
+parallel \
+    --jobs 30 \
+    """
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/r{5}/ \
+        --dataset-dim {2} \
+        --scaling-factor {1} \
+        --int-scaling-factor {1} \
+        --non-data-int-scaling-factor 0 \
         --h-layer 0 \
         --alpha 2.0 \
         --beta {4} \
         --seed {3} \
         --n_trotter 4 \
         --matrix_size 500 \
+        --r {5} \
         --projected ''
 
-    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${ndisf[@]}"
+    """ ::: "${sf[@]}" ::: "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${r[@]}"
