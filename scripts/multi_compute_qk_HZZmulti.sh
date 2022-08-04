@@ -23,7 +23,7 @@ parallel \
         --alpha 2.0 \
         --beta {4} \
         --seed {3} \
-        --n_trotter 4 \
+        --n_trotter 2 \
         --matrix_size 500 \
         --r {5} \
         --projected ''
@@ -42,7 +42,7 @@ parallel \
         --alpha 2.0 \
         --beta {4} \
         --seed {3} \
-        --n_trotter 4 \
+        --n_trotter 2 \
         --matrix_size 500 \
         --r {5} \
         --projected ''
