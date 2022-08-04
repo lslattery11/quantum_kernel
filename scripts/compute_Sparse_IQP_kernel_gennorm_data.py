@@ -47,10 +47,6 @@ if __name__ == '__main__':
         help = "beta value for generalized norm distribution"
     )
     parser.add_argument(
-        "--r",type=float,
-        required = True,
-        help = "correlation coefficent for data points")
-    parser.add_argument(
         "--projected",type=str,
         required = False,
         choices=['huang_proj',''],
