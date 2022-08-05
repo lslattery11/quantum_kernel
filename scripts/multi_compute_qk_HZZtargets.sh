@@ -13,7 +13,7 @@ r=(0.0)
 parallel \
     --jobs 30 \
     """
-        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/non_data_layer_test/beta{4}/gamma0.4/ \
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/gamma0.4/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor {1} \
@@ -38,7 +38,7 @@ r=(0.33)
 parallel \
     --jobs 30 \
     """
-        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/non_data_layer_test/beta{4}/gamma0.4/ \
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/gamma0.4/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor {1} \
@@ -63,7 +63,7 @@ r=(0.66)
 parallel \
     --jobs 30 \
     """
-        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/non_data_layer_test/beta{4}/gamma0.4/ \
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/rr_test/beta{4}/gamma0.4/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor {1} \
@@ -88,7 +88,7 @@ r=(1.0)
 parallel \
     --jobs 30 \
     """
-        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/non_data_layer_test/beta{4}/gamma0.4/ \
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/gamma0.4/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor {1} \
