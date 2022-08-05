@@ -63,7 +63,7 @@ r=(0.90)
 parallel \
     --jobs 30 \
     """
-        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/r0.90/gamma0.4/ \
+        python compute_HZZMultiScale_kernel_gennorm_data.py --outpath /nfs/gce/projects/gce/QK_project/results/HZZ_multi/final_gennorm/r_test/beta{4}/r0.9/gamma0.4/ \
         --dataset-dim {2} \
         --scaling-factor {1} \
         --int-scaling-factor {1} \
@@ -229,8 +229,8 @@ parallel \
 
     """ ::: "${sf[@]}" :::+ "${dim[@]}" ::: "${seed[@]}" ::: "${beta[@]}" ::: "${alpha[@]}" ::: "${r[@]}"
 
-sf=()
-dim=(4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
+sf=(12.132756610186643 4.5343076311961585 3.9926602261970756 3.4510128211979922 2.7549980756527344 2.48162892)
+dim=(13 14 15 16 17 18)
 seed=(10 1200 33 4 210)
 beta=(2.0)
 alpha=(2.0)
