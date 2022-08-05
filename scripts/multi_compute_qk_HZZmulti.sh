@@ -5,11 +5,12 @@ export PYTHONPATH=${PYTHONPATH}:/media/HomeData/lslattery/
 export PYTHONPATH=${PYTHONPATH}:/home/lslattery/
 
 
-mapfile -t sf < logspace-1.5.0.5.20.txt
-dim=(2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
+#mapfile -t sf < logspace-1.5.0.5.20.txt
+sf=(4.5708819  6.60693448  9.54992586 13.80384265 19.95262315)
+dim=(2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)
 seed=(10 1200 33 4 210)
 beta=(2.0)
-r=(0.9 0.95)
+r=(1.0)
 
 parallel \
     --jobs 30 \
