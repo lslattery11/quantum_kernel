@@ -37,7 +37,7 @@ def load_mnist(path, kind='train'):
 
     return images, labels
 
-def get_fashion_mnist_dataset(dataset_dim, n_train, n_test):
+def get_fashion_mnist_dataset(dataset_dim, n_train, n_test,split_index=-1):
     """ dataset from https://github.com/zalandoresearch/fashion-mnist
     Normalized, downscaled to dataset_dim and truncated to n_train, n_test
     """
@@ -59,9 +59,18 @@ def get_fashion_mnist_dataset(dataset_dim, n_train, n_test):
     x_train_normalized = x_train - feature_mean
     x_test_normalized = x_test - feature_mean
 
+    if split_index > -1:
+        x_train_normalized=np.array_split(x_train_normalized,4)[split_index]
+        x_test_normalized=np.array_split(x_test_normalized,4)[split_index]
+        y_train=np.array_split(y_train,4)[split_index]
+        y_test=np.array_split(y_test,4)[split_index]
+
     scikit_pca = PCA(n_components=dataset_dim)
     x_train = scikit_pca.fit_transform(x_train_normalized)
     x_test = scikit_pca.transform(x_test_normalized)
+
+
+
     x_train, x_test = x_train[:n_train], x_test[:n_test]
     y_train, y_test = y_train[:n_train], y_test[:n_test]
     return x_train, x_test, y_train, y_test
@@ -99,7 +108,7 @@ def get_kuzushiji_mnist_dataset(dataset_dim, n_train, n_test):
     return x_train, x_test, y_train, y_test
 
 
-def get_plasticc_dataset(dataset_dim, n_train, n_test):
+def get_plasticc_dataset(dataset_dim, n_train, n_test,split_index=0):
     """ dataset from https://arxiv.org/abs/2101.09581
     Normalized, downscaled to dataset_dim and truncated to n_train, n_test
     """
@@ -109,19 +118,28 @@ def get_plasticc_dataset(dataset_dim, n_train, n_test):
     Y = data[:,67]
     
     x_train_normalized, x_test_normalized, y_train, y_test = train_test_split(X, Y, train_size=n_train, test_size=n_test, random_state=42, stratify=Y)
+
+    if split_index > -1:
+        x_train_normalized=np.array_split(x_train_normalized,4)[split_index]
+        x_test_normalized=np.array_split(x_test_normalized,4)[split_index]
+        y_train=np.array_split(y_train,4)[split_index]
+        y_test=np.array_split(y_test,4)[split_index]
+    
+
     scikit_pca = PCA(n_components=dataset_dim)
     x_train = scikit_pca.fit_transform(x_train_normalized)
     x_test = scikit_pca.transform(x_test_normalized)
+
     return x_train, x_test, y_train, y_test
 
 
-def get_dataset(name, dataset_dim, n_train, n_test):
+def get_dataset(name, dataset_dim, n_train, n_test,split_index=-1):
     if name == 'fashion-mnist':
-        return get_fashion_mnist_dataset(dataset_dim, n_train, n_test)
+        return get_fashion_mnist_dataset(dataset_dim, n_train, n_test,split_index)
     elif name == 'kmnist':
         return get_kuzushiji_mnist_dataset(dataset_dim, n_train, n_test)
     elif name == 'plasticc':
-        return get_plasticc_dataset(dataset_dim, n_train, n_test)
+        return get_plasticc_dataset(dataset_dim, n_train, n_test,split_index)
     else:
         raise ValueError(f"Unknown dataset: {name}")
 

@@ -11,17 +11,17 @@ def s_complexity(K):
 
 #geometric difference (for generalization error) of kernel matrices. Eq. 5 from paper (See appendix F for inclusion of regularization parameter lambda.)
 #Note they reorder K1 and K2 in the appendix which is NOT the convention we follow here.
-#THE ORDER OF THE INPUTS MATTERS. We use gcq(K2||K1) with the (main text notation)
-def geometric_difference(K2,K1,lam=0,tol=1e-3,**kwargs):
+#THE ORDER OF THE INPUTS MATTERS. We use gcq(K1||K2) with the (main text notation)
+def geometric_difference(K1,K2,lam=0,tol=1e-3,**kwargs):
     assert(K1.shape==K2.shape),'K1 and K2 must be the same shape'
     assert(np.allclose(np.trace(K1),len(K1),atol=tol)),'K1 must be normalized Tr(K1)==N'
     assert(np.allclose(np.trace(K2),len(K2),atol=tol)),'K2 must be normalized Tr(K2)==N'
     #Could add an assertion that Ks are positive semidefinite and symmetric. Probably unecessary as they will be by construction (maybe do later).
     K1root=scipy.linalg.sqrtm(K1)
     K2root=scipy.linalg.sqrtm(K2)
-    K2inv2=np.linalg.matrix_power(K2+lam*np.eye(K2.shape[0]),-2)
+    K1inv2=np.linalg.matrix_power(K1+lam*np.eye(K1.shape[0]),-2)
     #multiply matrices
-    multiplied=np.linalg.multi_dot([K1root,K2root,K2inv2,K2root,K1root])
+    multiplied=np.linalg.multi_dot([K2root,K1root,K1inv2,K1root,K2root])
     #compute spectral norm and take root.
     gd=np.linalg.norm(multiplied,ord=np.inf)**(1/2)
     return gd
@@ -34,7 +34,8 @@ def training_geometric_difference(K1,K2,lam=0,tol=1e-3):
     assert(np.allclose(np.trace(K2),len(K2),atol=tol)),'K2 must be normalized Tr(K2)==N'
     #Could add an assertion that Ks are positive semidefinite and symmetric. Probably unecessary as they will be by construction (maybe do later).
     K1root=scipy.linalg.sqrtm(K1)
-    K2inv2=np.linalg.matrix_power(K2+lam*np.eye(K2.shape[0]),-2)
+    K2inv2=np.linalg.matrix_power(K2+lam*
+    np.eye(K2.shape[0]),-2)
     #multiply matrices
     multiplied=np.linalg.multi_dot([K1root,K2inv2,K1root])
     #compute spectral norm, take root, multiply by lam
@@ -189,4 +190,14 @@ def purity_of_average(rdms):
         rdm_avg=1/rdms.shape[0]*np.sum(rdms[:,i],axis=0)
         purity_of_average[i]=np.real(np.trace(rdm_avg @ rdm_avg))
     return purity_of_average
+
+#approximate dimension d given by equation F12 in Power of Data paper. Inefficient but whatever.
+def approximate_matrix_dimesnion(K,N):
+    d=0
+    w,_ = np.linalg.eigh(K)
+    w=w[::-1]
+    for k in range(1,N+1):
+        for l in range(k,N+1):
+            d+=1/(N-k)*w[l-1]
+    return d
 
